@@ -14,9 +14,8 @@ int main()
     int bandera = 0;
     char archivoEntrada[50];
     char archivoSalida[50];
-    char archivoLineasDeControl[50];
+    char archivoRegistro[50];
     Informacion* info = (Informacion*)malloc(sizeof(Informacion));
-    LineaDeControl* lineasControlDadas;
 
     do
     {
@@ -37,19 +36,19 @@ int main()
                     scanf("%s",archivoEntrada);            
                     instrucciones = contarLineas(archivoEntrada);
                     info = leerInstrucciones(archivoEntrada,instrucciones);
+                    mostrar(info->instrucciones,instrucciones);
                     bandera++;
                     break;
 
-            case 2: printf("Ingrese nombre del archivo de lineas de control\n");
-                    scanf("%s",archivoLineasDeControl); 
-                    contador = contarLineas(archivoLineasDeControl);
-                    lineasControlDadas = leerLineaDeControl(archivoLineasDeControl,contador);
+            case 2: printf("Ingrese nombre del archivo de registros\n");
+                    scanf("%s",archivoRegistro); 
+                    info = leerRegistros(info,archivoRegistro);
                     bandera++;
                     break;
 
-            case 3: if (bandera >= 1)
+            case 3: if (bandera == 2)
                     { 
-                        traza(info, info->instrucciones,archivoSalida,lineasControlDadas);
+                        //traza(info, info->instrucciones,archivoSalida,lineasControlDadas);
                     }
                     else
                     {

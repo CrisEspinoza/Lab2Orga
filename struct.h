@@ -77,14 +77,13 @@ typedef struct Informacion
 	int cantidadDeInstrucciones;
 	Label etiqueta[100];
 	int memoria[1000];
-	Lista* lineasDeControl;
 
 }Informacion;
 
 
 // FUNCIONES
 
-LineaDeControl* leerLineaDeControl(char nombre[],int numeroDeLineas);
+Informacion* leerRegistros(Informacion* info,char nombre[]);
 void inicializarMemoriaParaInstrucciones(Informacion *informacion, int cantidadLineas);
 Informacion* leerInstrucciones(char nombre[], int numeroDeLineas);
 int obtenerPosicionReg(char* registro);
@@ -96,8 +95,7 @@ void subi (Informacion *info , Instruccion *instruccion);
 void addi (Informacion *info , Instruccion *instruccion);
 void mul (Informacion *info , Instruccion *instruccion);
 void divi (Informacion *info , Instruccion *instruccion);
-LineaDeControl* asignarLineasDeControl (char* instruccion, int PC);
-void traza(Informacion* info, Instruccion* instrucciones,char* nombreArchivoSalida, LineaDeControl* lineasControlDadas);
+void asignarLineasDeControl (Informacion* info,char* instruccion, int PC);
 int jump(Informacion *info, Instruccion *instruccion);
 int buscarPosicionEtiqueta(char* etiqueta, Informacion *info);
 void sw(Informacion *info, Instruccion *instruccion);
@@ -106,5 +104,5 @@ int beq(Informacion *info, Instruccion *instruccion);
 Lista* crearLista();
 Lista* agregarNodo(Lista* lista , LineaDeControl* aux);
 void mostrarLineasDeControl(Lista* lista);
-void mostrar(LineaDeControl* lista, int largo);
+void mostrar(Instruccion* lista, int largo);
 void realizarSalida(Lista* lista,LineaDeControl* lineasControlDadas);
