@@ -213,7 +213,7 @@ void inicializarMemoriaParaInstrucciones(Informacion *informacion, int cantidadL
     int i ;
 
     informacion->instrucciones = (Instruccion*)malloc(sizeof(Instruccion)*cantidadLineas);
-    informacion->buffer = (Buffer*)malloc(sizeof(Buffer)*4);
+    informacion->buffer = (Buffer*)malloc(sizeof(Buffer)*5);
 
     for (i = 0; i < cantidadLineas; i++)
     {
@@ -230,9 +230,9 @@ void inicializarMemoriaParaInstrucciones(Informacion *informacion, int cantidadL
         informacion->etiqueta[i].label = (char*)malloc(sizeof(char)*50);
     }
 
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < 5; i++)
     {
-        informacion->buffer[i].instruccion = (Instruccion*)malloc(sizeof(Instruccion));   
+        informacion->buffer[i].instruccion = (Instruccion*)malloc(sizeof(Instruccion)); 
         informacion->buffer[i].instruccion->instruccion = (char*)malloc(sizeof(char)*100);
         informacion->buffer[i].instruccion->rt = (char*)malloc(sizeof(char)*100);
         informacion->buffer[i].instruccion->rd = (char*)malloc(sizeof(char)*100);
@@ -483,11 +483,13 @@ void add(Informacion *informacion, Instruccion *instruccion, int PC,int etapa) /
 
     else if(etapa == 5) //ETAPA WB
     {
+        informacion->buffer[4] = informacion->buffer[3];
         // Etapa nueva
         informacion->buffer[3].estado = 0;
         informacion->registros[posrd] = informacion->buffer[3].writeDataWb;
         printf("Instruccion WB: Numero a guardar: %d \n", informacion->buffer[3].writeDataWb);
         printf("Instruccion WB: Resultado: %d \n", informacion->registros[posrd]);
+
     }   
 }
 
@@ -567,6 +569,7 @@ void sub(Informacion *informacion, Instruccion *instruccion, int PC,int etapa) /
 
     else if(etapa == 5) //ETAPA WB
     {
+        informacion->buffer[4] = informacion->buffer[3];
         // Etapa nueva
         informacion->buffer[3].estado = 0;
         informacion->registros[posrd] = informacion->buffer[3].writeDataWb;
@@ -597,6 +600,7 @@ void mul(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     {   
         informacion->buffer[0].instruccion = instruccion;
         informacion->buffer[0].addPc = PC++;
+        informacion->buffer[0].estado = 1;
 
         printf("Instruccion IF/ID: %s \n", informacion->buffer[0].instruccion->instruccion);
     }
@@ -604,6 +608,7 @@ void mul(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     else if(etapa == 2) //ETAPA ID buffers[1] = ID/EX
     {
         informacion->buffer[1] = informacion->buffer[0];
+        informacion->buffer[0].estado = 0;
         // Etapa nueva 
         informacion->buffer[1].muxRegDs = informacion->buffer[1].instruccion->rd;
         informacion->buffer[1].rs = informacion->buffer[1].instruccion->rs;
@@ -624,6 +629,7 @@ void mul(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     else if(etapa == 3) //ETAPA EX buffers[2] = EX/MEM
     {   
         informacion->buffer[2] = informacion->buffer[1];
+        informacion->buffer[1].estado = 0;
         // Etapa nueva 
         informacion->buffer[2].aluResult = informacion->buffer[2].readData1Id * informacion->buffer[2].readData2Id;
 
@@ -636,6 +642,7 @@ void mul(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     else if(etapa == 4) //ETAPA MEM buffers[3] = MEM/WB
     {
         informacion->buffer[3] = informacion->buffer[2];
+        informacion->buffer[2].estado = 0;
         //Etapa nueva         
         informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
 
@@ -648,14 +655,15 @@ void mul(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     else if(etapa == 5) //ETAPA WB
     {
         informacion->buffer[4] = informacion->buffer[3];
+        informacion->buffer[3].estado = 0;
         // Etapa nueva
-        informacion->registros[posrd] = informacion->buffer[4].writeDataWb;
+        informacion->registros[posrd] = informacion->buffer[3].writeDataWb;
 
-        printf("Instruccion WM: %s %s %s %s \n", informacion->buffer[4].instruccion->instruccion,informacion->buffer[4].instruccion->rd , informacion->buffer[4].instruccion->rs, 
-            informacion->buffer[4].instruccion->rt);
-        printf("Instruccion WM: Resultado: %d %d \n", informacion->buffer[4].aluResult,informacion->buffer[3].writeDataWb);
+        printf("Instruccion WM: %s %s %s %s \n", informacion->buffer[3].instruccion->instruccion,informacion->buffer[3].instruccion->rd , informacion->buffer[3].instruccion->rs, 
+            informacion->buffer[3].instruccion->rt);
+        printf("Instruccion WM: Resultado: %d %d \n", informacion->buffer[3].aluResult,informacion->buffer[3].writeDataWb);
         printf("El nuevo registor es :%d\n", informacion->registros[posrd]);
-        mostrarLineasControl(informacion->buffer[4].lineaDeControl);
+        mostrarLineasControl(informacion->buffer[3].lineaDeControl);
     }   
 }
 
@@ -710,6 +718,7 @@ void vacio(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
 
     else if(etapa == 5) //ETAPA WB
     {
+        informacion->buffer[4] = informacion->buffer[3];
         informacion->buffer[3].estado = 0;
         // Etapa nueva
         printf("Instruccion WB: %s \n", informacion->buffer[3].instruccion->instruccion);
@@ -738,6 +747,7 @@ void division(Informacion *informacion, Instruccion *instruccion, int PC,int eta
     {   
         informacion->buffer[0].instruccion = instruccion;
         informacion->buffer[0].addPc = PC++;
+        informacion->buffer[0].estado = 1;
 
         printf("Instruccion IF/ID: %s \n", informacion->buffer[0].instruccion->instruccion);
     }
@@ -745,6 +755,7 @@ void division(Informacion *informacion, Instruccion *instruccion, int PC,int eta
     else if(etapa == 2) //ETAPA ID buffers[1] = ID/EX
     {
         informacion->buffer[1] = informacion->buffer[0];
+        informacion->buffer[0].estado = 0;
         // Etapa nueva 
         informacion->buffer[1].muxRegDs = informacion->buffer[1].instruccion->rd;
         informacion->buffer[1].rs = informacion->buffer[1].instruccion->rs;
@@ -765,6 +776,7 @@ void division(Informacion *informacion, Instruccion *instruccion, int PC,int eta
     else if(etapa == 3) //ETAPA EX buffers[2] = EX/MEM
     {   
         informacion->buffer[2] = informacion->buffer[1];
+        informacion->buffer[1].estado = 0;
         // Etapa nueva 
         informacion->buffer[2].aluResult = informacion->buffer[2].readData1Id / informacion->buffer[2].readData2Id;
 
@@ -777,6 +789,7 @@ void division(Informacion *informacion, Instruccion *instruccion, int PC,int eta
     else if(etapa == 4) //ETAPA MEM buffers[3] = MEM/WB
     {
         informacion->buffer[3] = informacion->buffer[2];
+        informacion->buffer[2].estado = 0;
         //Etapa nueva         
         informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
 
@@ -789,14 +802,15 @@ void division(Informacion *informacion, Instruccion *instruccion, int PC,int eta
     else if(etapa == 5) //ETAPA WB
     {
         informacion->buffer[4] = informacion->buffer[3];
+        informacion->buffer[3].estado = 0;
         // Etapa nueva
-        informacion->registros[posrd] = informacion->buffer[4].writeDataWb;
+        informacion->registros[posrd] = informacion->buffer[3].writeDataWb;
 
-        printf("Instruccion WM: %s %s %s %s \n", informacion->buffer[4].instruccion->instruccion,informacion->buffer[4].instruccion->rd , informacion->buffer[4].instruccion->rs, 
-            informacion->buffer[4].instruccion->rt);
-        printf("Instruccion WM: Resultado: %d %d %d \n", informacion->buffer[4].aluResult,informacion->buffer[3].writeDataWb);
+        printf("Instruccion WM: %s %s %s %s \n", informacion->buffer[3].instruccion->instruccion,informacion->buffer[3].instruccion->rd , informacion->buffer[3].instruccion->rs, 
+            informacion->buffer[3].instruccion->rt);
+        printf("Instruccion WM: Resultado: %d %d %d \n", informacion->buffer[3].aluResult,informacion->buffer[3].writeDataWb);
         printf("El nuevo registor es :%d\n", informacion->registros[posrd]);
-        mostrarLineasControl(informacion->buffer[4].lineaDeControl);
+        mostrarLineasControl(informacion->buffer[3].lineaDeControl);
     }   
 }
 
@@ -821,6 +835,7 @@ void subi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     {   
         informacion->buffer[0].instruccion = instruccion;
         informacion->buffer[0].addPc = PC++;
+        informacion->buffer[0].estado = 1;
 
         printf("Instruccion IF/ID: %s \n", informacion->buffer[0].instruccion->instruccion);
     }
@@ -828,6 +843,7 @@ void subi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     else if(etapa == 2) //ETAPA ID buffers[1] = ID/EX
     {
         informacion->buffer[1] = informacion->buffer[0];
+        informacion->buffer[0].estado = 0;
         // Etapa nueva 
         informacion->buffer[1].muxRegDs = informacion->buffer[1].instruccion->rd;
         informacion->buffer[1].rs = informacion->buffer[1].instruccion->rs;
@@ -847,6 +863,7 @@ void subi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     else if(etapa == 3) //ETAPA EX buffers[2] = EX/MEM
     {   
         informacion->buffer[2] = informacion->buffer[1];
+        informacion->buffer[1].estado = 0;
         // Etapa nueva 
         informacion->buffer[2].aluResult = informacion->buffer[2].readData1Id - informacion->buffer[2].signoExtendido;
 
@@ -859,6 +876,7 @@ void subi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     else if(etapa == 4) //ETAPA MEM buffers[3] = MEM/WB
     {
         informacion->buffer[3] = informacion->buffer[2];
+        informacion->buffer[2].estado = 0;
         //Etapa nueva         
         informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
 
@@ -871,14 +889,15 @@ void subi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     else if(etapa == 5) //ETAPA WB
     {
         informacion->buffer[4] = informacion->buffer[3];
-        // Etapa nueva
-        informacion->registros[posrt] = informacion->buffer[4].writeDataWb;
+        informacion->buffer[3].estado = 0;       
+         // Etapa nueva
+        informacion->registros[posrt] = informacion->buffer[3].writeDataWb;
 
-        printf("Instruccion WM: %s %s %s %d \n", informacion->buffer[4].instruccion->instruccion,informacion->buffer[4].instruccion->rt , informacion->buffer[4].instruccion->rs, 
-            informacion->buffer[4].instruccion->inmediato);
-        printf("Instruccion WM: Resultado: %d %d %d \n", informacion->buffer[4].aluResult,informacion->buffer[3].writeDataWb);
+        printf("Instruccion WM: %s %s %s %d \n", informacion->buffer[3].instruccion->instruccion,informacion->buffer[3].instruccion->rt , informacion->buffer[3].instruccion->rs, 
+            informacion->buffer[3].instruccion->inmediato);
+        printf("Instruccion WM: Resultado: %d %d %d \n", informacion->buffer[3].aluResult,informacion->buffer[3].writeDataWb);
         printf("El nuevo registor es :%d\n", informacion->registros[posrt]);
-        mostrarLineasControl(informacion->buffer[4].lineaDeControl);
+        mostrarLineasControl(informacion->buffer[3].lineaDeControl);
     }   
 }
 
@@ -902,6 +921,7 @@ void addi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     {   
         informacion->buffer[0].instruccion = instruccion;
         informacion->buffer[0].addPc = PC++;
+        informacion->buffer[0].estado = 1;
 
         printf("Instruccion IF/ID: %s \n", informacion->buffer[0].instruccion->instruccion);
     }
@@ -909,6 +929,7 @@ void addi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     else if(etapa == 2) //ETAPA ID buffers[1] = ID/EX
     {
         informacion->buffer[1] = informacion->buffer[0];
+        informacion->buffer[0].estado = 0;
         // Etapa nueva 
         informacion->buffer[1].muxRegDs = informacion->buffer[1].instruccion->rd;
         informacion->buffer[1].rs = informacion->buffer[1].instruccion->rs;
@@ -928,6 +949,7 @@ void addi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     else if(etapa == 3) //ETAPA EX buffers[2] = EX/MEM
     {   
         informacion->buffer[2] = informacion->buffer[1];
+        informacion->buffer[1].estado = 0;
         // Etapa nueva 
         informacion->buffer[2].aluResult = informacion->buffer[2].readData1Id + informacion->buffer[2].signoExtendido;
 
@@ -940,6 +962,7 @@ void addi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     else if(etapa == 4) //ETAPA MEM buffers[3] = MEM/WB
     {
         informacion->buffer[3] = informacion->buffer[2];
+        informacion->buffer[2].estado = 0;
         //Etapa nueva         
         informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
 
@@ -952,14 +975,15 @@ void addi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     else if(etapa == 5) //ETAPA WB
     {
         informacion->buffer[4] = informacion->buffer[3];
+        informacion->buffer[3].estado = 0;
         // Etapa nueva
-        informacion->registros[posrt] = informacion->buffer[4].writeDataWb;
+        informacion->registros[posrt] = informacion->buffer[3].writeDataWb;
 
-        printf("Instruccion WM: %s %s %s %d \n", informacion->buffer[4].instruccion->instruccion,informacion->buffer[4].instruccion->rt , informacion->buffer[4].instruccion->rs, 
-            informacion->buffer[4].instruccion->inmediato);
-        printf("Instruccion WM: Resultado: %d %d %d \n", informacion->buffer[4].aluResult,informacion->buffer[3].writeDataWb);
+        printf("Instruccion WM: %s %s %s %d \n", informacion->buffer[3].instruccion->instruccion,informacion->buffer[3].instruccion->rt , informacion->buffer[3].instruccion->rs, 
+            informacion->buffer[3].instruccion->inmediato);
+        printf("Instruccion WM: Resultado: %d %d %d \n", informacion->buffer[3].aluResult,informacion->buffer[3].writeDataWb);
         printf("El nuevo registor es :%d\n", informacion->registros[posrt]);
-        mostrarLineasControl(informacion->buffer[4].lineaDeControl);
+        mostrarLineasControl(informacion->buffer[3].lineaDeControl);
     }   
 }
 
@@ -1085,6 +1109,7 @@ void lw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
 
     else if(etapa == 5) //ETAPA WB
     {
+        informacion->buffer[4] = informacion->buffer[3];
         informacion->buffer[3].estado = 0;
         // Etapa nueva
         informacion->registros[posrt] = informacion->buffer[3].writeDataWb;
@@ -1158,7 +1183,6 @@ void sw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[2].estado = 0;
         //Etapa nueva         
         informacion->memoria[informacion->buffer[3].aluResult] = informacion->registros[informacion->buffer[3].posRegistro];
-        informacion->buffer[3].estado = 0;
 
         printf("Instruccion MEM/WB: %s %s %s %d \n", informacion->buffer[3].instruccion->instruccion,informacion->buffer[3].instruccion->rt , informacion->buffer[3].instruccion->rs, 
             informacion->buffer[3].instruccion->inmediato);
@@ -1168,6 +1192,8 @@ void sw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
 
     else if(etapa == 5) //ETAPA WB
     {
+        informacion->buffer[4] = informacion->buffer[3];
+        informacion->buffer[3].estado = 0;
         //No ocupe esta etapa
     }   
 }
@@ -1324,43 +1350,6 @@ LineaDeControl* asignarLineasDeControl (char* instruccion)
     return aux;
 }
 
-/*
-- Entrada: -
-- Salida: Entrega una lista inicializada.
-- Procedimiento: Se encarga de pedir memoria para la ista y iniciarlizar cada uno de los parametros que cotiene la estructura.
- */
-
-Lista* crearLista() // Creamos la lista nueva 
-{
-    Lista* lista = (Lista*)malloc(sizeof(Lista)); // Pedimos memoria para la nueva lista 
-    lista->lineaTraza = NULL;
-    lista->largo = 0 ; // El largo de la lista es igual a "0".
-    return lista; // Se retorna la lista creada
-}
-
-/*
-- Entrada: Funcion que recibe como parametro una lista y una linea de control.
-- Salida: Entrega la lista.
-- Procedimiento: Se encarga de agregar la linea de control reciida como parametro a la lista que se tiene, ademas de 
-aumentar el tamaño de esta lista.
- */
-
-Lista* agregarNodo(Lista* lista , LineaDeControl* aux)
-{
-    if(lista->largo == 0)
-    {
-        lista->lineaTraza = (LineaDeControl*)malloc(sizeof(LineaDeControl));
-        lista->lineaTraza[0] = *aux;
-    }
-    else
-    {
-        lista->lineaTraza = (LineaDeControl*)realloc(lista->lineaTraza, (lista->largo + 1) * sizeof (LineaDeControl)); // Pedimos mas memoria para el arreglo creado
-        lista->lineaTraza[lista->largo] = *aux; // Agregamos el nodo que se desea agregar, luego de haber solicitado memoria
-    }
-    lista->largo++; // aumnetamos el largo de la lista de arreglos
-    return lista;
-}
-
 int is_nop(Informacion* informacion)
 {
     printf("Buffer 1 : %s - buffer 2 : %s \n", informacion->buffer[1].rt, informacion->buffer[0].instruccion->rs);
@@ -1427,7 +1416,7 @@ int chequearBuffer(Informacion* informacion)
 void pipeLine(Informacion *informacion)
 {
     int i;
-    int ciclo = 0;
+    int ciclo = 1;
     int nubes = 4;
     int instruccionEjecutadas = 0;
 
@@ -1444,7 +1433,7 @@ void pipeLine(Informacion *informacion)
     {
         printf("\n");
         printf("\n");
-        printf("Estamos en el ciclo numero : %d \n", (ciclo+1) );
+        printf("Estamos en el ciclo numero : %d \n", ciclo );
         printf("\n");
         printf("\n");
 
@@ -1482,6 +1471,7 @@ void pipeLine(Informacion *informacion)
                 etapaIF(informacion,nob,i);
                 nubes++;   
             }
+
             else
             {
                 printf("%d\n", i);
@@ -1490,6 +1480,13 @@ void pipeLine(Informacion *informacion)
             }
         }
 
+        else if (informacion->cantidadDeInstrucciones <= instruccionEjecutadas)
+        {
+            etapaIF(informacion,nob,i);
+            instruccionEjecutadas++;
+        }
+
+        escribirArchivo(informacion ,ciclo);
         ciclo++;
     }
 }
@@ -1896,15 +1893,63 @@ void fordwarding(Informacion *informacion)
     }
 }
 
-int archivo(int count, struct MyData *data, char const *fileName) 
+int escribirArchivo(Informacion* informacion, int ciclo) 
 { 
-  FILE *f = fopen(fileName, "w"); 
-  if (f == NULL) return -1; 
-  while (count-- > 0) { 
-    // you might want to check for out-of-disk-space here, too 
-    fprintf(f, "%d,%s,%f\n", data->someValue, data->someString, data->someSample); 
-    ++data; 
-  } 
-  fclose(f); 
-  return 0; 
+    FILE *archivo = fopen("salida1.csv", "a"); 
+
+    int i ;
+    if (ciclo == 1)
+    {
+        fprintf (archivo, "%s ; %s ;%s ;%s ;%s ;%s \n", "Etapas","IF","ID","EX","MEM","WB");
+    }
+
+    fprintf(archivo, " %d ;", ciclo );
+
+    for (i = 0; i < 5; i++)
+    {
+        if  (
+        !strcmp(informacion->buffer[i].instruccion->instruccion,"add") ||
+        !strcmp(informacion->buffer[i].instruccion->instruccion,"sub") ||
+        !strcmp(informacion->buffer[i].instruccion->instruccion,"mul") ||
+        !strcmp(informacion->buffer[i].instruccion->instruccion,"div")
+        )
+        {
+            fprintf (archivo, "%s %s %s %s ;",informacion->buffer[i].instruccion->instruccion,informacion->buffer[i].instruccion->rd, informacion->buffer[i].instruccion->rs ,
+            informacion->buffer[i].instruccion->rt);
+        }
+
+        else if (
+        !strcmp(informacion->buffer[i].instruccion->instruccion,"addi") ||
+        !strcmp(informacion->buffer[i].instruccion->instruccion,"subi")
+        )
+        {
+            fprintf (archivo, "%s %s %s %d ;",informacion->buffer[i].instruccion->instruccion,informacion->buffer[i].instruccion->rt, informacion->buffer[i].instruccion->rs ,
+            informacion->buffer[i].instruccion->inmediato);
+        }
+
+        else if (!strcmp(informacion->buffer[i].instruccion->instruccion,"lw") ) 
+        {
+            fprintf (archivo, "%s %s %d(%s) ;",informacion->buffer[i].instruccion->instruccion,informacion->buffer[i].instruccion->rt, informacion->buffer[i].instruccion->inmediato ,
+            informacion->buffer[i].instruccion->rs);
+        }
+
+        else if ( !strcmp(informacion->buffer[i].instruccion->instruccion,"sw") && i < 4 )
+        {
+            fprintf (archivo, "%s %s %d(%s) ;",informacion->buffer[i].instruccion->instruccion,informacion->buffer[i].instruccion->rt, informacion->buffer[i].instruccion->inmediato ,
+            informacion->buffer[i].instruccion->rs);
+        }
+
+        else if (
+        !strcmp(informacion->buffer[i].instruccion->instruccion,"vacio") 
+        )
+        {
+            fprintf (archivo, ";");
+        }
+        
+    }
+
+    fprintf(archivo, "\n");
+
+    fclose(archivo); 
+    return 0; 
 } 
