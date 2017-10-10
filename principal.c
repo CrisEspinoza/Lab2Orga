@@ -21,7 +21,7 @@ int main()
     {
         printf( "\n   1. Ingrese el nombre del archivo de instrucciones de mips");
         printf( "\n   2. Ingrese el nombre del archivo de lineas de control");
-        printf( "\n   3. Realizar la salida del programa");
+        printf( "\n   3. Realizar la traza del programa");
         printf( "\n   4. Creditos");
         printf( "\n   5. Salir" );
         printf( "\n\n   Introduzca opcion (1-5): ");
@@ -32,23 +32,27 @@ int main()
 
         switch ( opcion )
         {
-            case 1: printf("Ingrese nombre del archivo a leer\n");
+            case 1: system("cls");
+                    printf("Ingrese nombre del archivo a leer\n");
                     scanf("%s",archivoEntrada);            
                     instrucciones = contarLineas(archivoEntrada);
                     info = leerInstrucciones(archivoEntrada,instrucciones);
-                    mostrar(info->instrucciones,instrucciones);
                     bandera++;
                     break;
 
-            case 2: printf("Ingrese nombre del archivo de registros\n");
+            case 2: system("cls");
+                    printf("Ingrese nombre del archivo de registros\n");
                     scanf("%s",archivoRegistro); 
                     info = leerRegistros(info,archivoRegistro);
                     bandera++;
                     break;
 
-            case 3: if (bandera == 2)
+            case 3: system("cls");
+                    if (bandera >= 2)
                     { 
-                        //traza(info, info->instrucciones,archivoSalida,lineasControlDadas);
+                        printf("Entre\n");
+                        //mostrarBuffer(info->buffer);
+                        pipeLine(info);
                     }
                     else
                     {
@@ -56,8 +60,10 @@ int main()
                     }
                     break;
 
-            case 4: printf(" * Autor: CRISTIAN EDUARDO ESPINOZA SILVA \n ");
+            case 4: system("cls");
+                    printf(" * Autor: CRISTIAN EDUARDO ESPINOZA SILVA \n ");
                     printf(" * Universidad santiago de chile \n");
+                    system("cls");
                     break;
         }
 

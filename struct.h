@@ -15,8 +15,6 @@ const char *registroMars[32] = {"$zero","$at","$v0","$v1","$a0","$a1","$a2","$a3
 
 typedef struct LineaDeControl
 {
-	char* Estado;
-	int PC;
 	char RegDst;
 	char Jump;
 	char Branch;
@@ -28,15 +26,6 @@ typedef struct LineaDeControl
 	char RegWrite;
 
 }LineaDeControl;
-
-// Esta estrucutra se encarga de guardar la posicion de la etiqueta y el nombre correspodiente
-
-typedef struct Label
-{
-	char *label;
-	int PC;
-
-}Label;
 
 
  /*
@@ -55,6 +44,45 @@ typedef struct Instruccion
 	LineaDeControl* lineaDeControl;
 
 }Instruccion;
+
+
+typedef struct Buffer
+{
+	int estado;
+	Instruccion* instruccion;
+	LineaDeControl* lineaDeControl;
+	char* muxRegDs;
+	char* register1;
+	char* register2;
+	int readData1Id;
+	int readData2Id;
+	int signoExtendido;
+	int ALU;
+	char* address;
+	char* writeDataMem;
+	int readData1Mem;
+	char* writeRegister;
+	int writeDataWb;
+	int zero;
+	int aluResult;
+	int addPc;
+	char* rs;
+	char* rt;
+	char* rd;
+	int posRegistro;
+}Buffer;
+
+
+// Esta estrucutra se encarga de guardar la posicion de la etiqueta y el nombre correspodiente
+
+typedef struct Label
+{
+	char *label;
+	int PC;
+
+}Label;
+
+
 
 // Estructura que se encarga de armar una lista con tamaño variable que contendra una cantidad de lineas de control
 
@@ -77,6 +105,7 @@ typedef struct Informacion
 	int cantidadDeInstrucciones;
 	Label etiqueta[100];
 	int memoria[1000];
+	Buffer* buffer;
 
 }Informacion;
 
@@ -89,20 +118,35 @@ Informacion* leerInstrucciones(char nombre[], int numeroDeLineas);
 int obtenerPosicionReg(char* registro);
 int contarLineas(char nombre[]);
 int obtenerPosicionReg(char* registro);
-void add (Informacion* info , Instruccion* instruccion);
-void sub (Informacion* info , Instruccion* instruccion);
-void subi (Informacion *info , Instruccion *instruccion);
-void addi (Informacion *info , Instruccion *instruccion);
-void mul (Informacion *info , Instruccion *instruccion);
-void divi (Informacion *info , Instruccion *instruccion);
-void asignarLineasDeControl (Informacion* info,char* instruccion, int PC);
+void add(Informacion *informacion, Instruccion *instruccion, int PC,int etapa);
+void sub(Informacion *informacion, Instruccion *instruccion, int PC,int etapa);
+void subi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa);
+void addi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa);
+void mul(Informacion *informacion, Instruccion *instruccion, int PC,int etapa);
+void division(Informacion *informacion, Instruccion *instruccion, int PC,int etapa);
+LineaDeControl* asignarLineasDeControl (char* instruccion);
 int jump(Informacion *info, Instruccion *instruccion);
 int buscarPosicionEtiqueta(char* etiqueta, Informacion *info);
-void sw(Informacion *info, Instruccion *instruccion);
-void lw(Informacion *info, Instruccion *instruccion);
+void sw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa);
+void lw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa);
 int beq(Informacion *info, Instruccion *instruccion);
 Lista* crearLista();
 Lista* agregarNodo(Lista* lista , LineaDeControl* aux);
 void mostrarLineasDeControl(Lista* lista);
 void mostrar(Instruccion* lista, int largo);
 void realizarSalida(Lista* lista,LineaDeControl* lineasControlDadas);
+LineaDeControl* resetearLineasControl(LineaDeControl* lineaDeContol);
+void iniciarBuffer(Buffer* buffer);
+void pipeLine(Informacion *informacion);
+void etapaIF(Informacion *info, Instruccion *instruccion, int PC);
+Instruccion* inicializarIntrucciones(Instruccion* instruccion);
+void mostrarLineasControl(LineaDeControl* aux);
+Instruccion* resetearInstruccion(Instruccion* instruccion);
+void resetearBuffer(Buffer *buffer);
+void etapaID(Informacion *info, int PC);
+void etapaEX(Informacion *info,int PC);
+void etapaMEM(Informacion *info, int PC);
+void etapaWB(Informacion *info, int PC);
+int chequearBuffer(Informacion* informacion);
+void vacio(Informacion *informacion, Instruccion *instruccion, int PC,int etapa);
+void fordwarding(Informacion *informacion);
