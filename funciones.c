@@ -4,6 +4,9 @@
 #include <locale.h>
 #include "struct.h"
 
+
+int INTRUCCIONESEJECUTADAS = 0;
+
 // Funciones que leen los archivos
 
 /*
@@ -997,15 +1000,50 @@ void addi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
 buscarPosicionEtiqueta y entregue el numero de donde se encuentra
  */
 
-int jump(Informacion *info, Instruccion *instruccion)
+int jump(Informacion *informacion, Instruccion *instruccion, int PC, int etapa)
 {   
-    int PC;
-    char *etiqueta = (char*)malloc(sizeof(char)*100);
-    strcpy(etiqueta,instruccion->rd);
-    strcat(etiqueta,":");
-    PC = buscarPosicionEtiqueta(etiqueta, info);
 
-    return PC;
+    if(etapa == 1) // ETAPA IF buffers[0] = IF/ID
+    {   
+        informacion->buffer[0].instruccion = instruccion;
+        informacion->buffer[0].addPc = PC;
+        informacion->buffer[0].estado = 1;
+
+        printf("Instruccion IF/ID: %s \n", informacion->buffer[0].instruccion->instruccion);
+    }
+
+    else if(etapa == 2) //ETAPA ID buffers[1] = ID/EX
+    {
+        informacion->buffer[1] = informacion->buffer[0];
+        informacion->buffer[0].estado = 0;
+        // Etapa nueva 
+        informacion->buffer[1].rs = informacion->buffer[1].instruccion->rs;
+        informacion->buffer[1].rt = informacion->buffer[1].instruccion->rt;        
+        informacion->buffer[1].rd = informacion->buffer[1].instruccion->rt;
+        char *etiqueta = (char*)malloc(sizeof(char)*100);
+        strcpy(etiqueta,informacion->buffer[1].instruccion->rd);
+        strcat(etiqueta,":");
+        INTRUCCIONESEJECUTADAS = buscarPosicionEtiqueta(etiqueta, informacion);
+
+    }
+ 
+    else if(etapa == 3) //ETAPA EX buffers[2] = EX/MEM
+    {   
+        informacion->buffer[2] = informacion->buffer[1];
+        informacion->buffer[1].estado = 0;
+    }
+
+    else if(etapa == 4) //ETAPA MEM buffers[3] = MEM/WB
+    {
+        informacion->buffer[3] = informacion->buffer[2];
+        informacion->buffer[2].estado = 0;
+    }
+
+    else if(etapa == 5) //ETAPA WB
+    {
+        informacion->buffer[4] = informacion->buffer[3];
+        informacion->buffer[3].estado = 0;
+    } 
 }
 
 /*
@@ -1359,8 +1397,10 @@ int is_nop(Informacion* informacion)
 {
     printf("Buffer 1 : %s - buffer 2 : %s \n", informacion->buffer[1].rt, informacion->buffer[0].instruccion->rs);
     printf("Buffer 1 : %s - buffer 2 : %s \n", informacion->buffer[1].rt, informacion->buffer[0].instruccion->rt);
+    printf("%d %d \n", informacion->buffer[0].addPc , informacion->buffer[1].addPc );
     
-    if( (informacion->buffer[1].lineaDeControl->MemRead == '1' ) && ( strcmp(informacion->buffer[1].rt , informacion->buffer[0].instruccion->rs ) == 0 || 
+    if( (informacion->buffer[1].lineaDeControl->MemRead == '1' )  && 
+        ( strcmp(informacion->buffer[1].rt , informacion->buffer[0].instruccion->rs ) == 0 || 
         strcmp( informacion->buffer[1].rt , informacion->buffer[0].instruccion->rt ) == 0 ) )  
     {
         return 1;
@@ -1468,35 +1508,35 @@ void hazarDatoMEM( Informacion* informacion )
 
 Instruccion* resetearInstruccion(Instruccion* instruccion)
 {
-    strcpy(instruccion->instruccion, "vacio");
-    strcpy(instruccion->rs , "");
-    strcpy(instruccion->rt , "");
-    strcpy(instruccion->rd , "");
+    instruccion->instruccion = "vacio";
+    instruccion->rs = "" ;
+    instruccion->rt = "" ;
+    instruccion->rd = "" ;
 }
 
-void resetearBuffer(Buffer *buffer)
+void resetearBuffer(Informacion* informacion)
 {
-    buffer->instruccion = resetearInstruccion(buffer->instruccion);
-    buffer->lineaDeControl = resetearLineasControl(buffer->lineaDeControl);
-    buffer->addPc = 0;
-    buffer->posRegistro = 0;
-    buffer->readData1Id = 0;
-    buffer->readData2Id = 0;
-    buffer->signoExtendido= 0;
-    buffer->zero = 0;
-    buffer->aluResult = 0;
-    buffer->readData1Mem = 0;
-    buffer->ALU = 0;
-    buffer->writeDataWb = 0;
-    buffer->rs = "" ;
-    buffer->rt = "";
-    buffer->register1 = "";
-    buffer->writeRegister = "";
-    buffer->writeDataMem = "";
-    buffer->address = "" ;
-    buffer->register2 = "";
-    buffer->rd = "";
-    buffer->muxRegDs = "";
+    informacion->buffer[0].instruccion = resetearInstruccion(informacion->buffer[0].instruccion);
+    informacion->buffer[0].lineaDeControl = resetearLineasControl(informacion->buffer[0].lineaDeControl);
+    informacion->buffer[0].addPc = 0;
+    informacion->buffer[0].posRegistro = 0;
+    informacion->buffer[0].readData1Id = 0;
+    informacion->buffer[0].readData2Id = 0;
+    informacion->buffer[0].signoExtendido= 0;
+    informacion->buffer[0].zero = 0;
+    informacion->buffer[0].aluResult = 0;
+    informacion->buffer[0].readData1Mem = 0;
+    informacion->buffer[0].ALU = 0;
+    informacion->buffer[0].writeDataWb = 0;
+    informacion->buffer[0].rs = "" ;
+    informacion->buffer[0].rt = "";
+    informacion->buffer[0].register1 = "";
+    informacion->buffer[0].writeRegister = "";
+    informacion->buffer[0].writeDataMem = "";
+    informacion->buffer[0].address = "" ;
+    informacion->buffer[0].register2 = "";
+    informacion->buffer[0].rd = "";
+    informacion->buffer[0].muxRegDs = "";
 }
 
 int chequearBuffer(Informacion* informacion)
@@ -1519,7 +1559,7 @@ void pipeLine(Informacion *informacion)
 {
     int i = 0;
     int ciclo = 1;
-    int instruccionEjecutadas = 0;
+    int nubes = 0;
 
     Instruccion* nob = (Instruccion*)malloc(sizeof(Informacion));
     nob->instruccion = (char*)malloc(sizeof(char)*100);
@@ -1541,50 +1581,56 @@ void pipeLine(Informacion *informacion)
         if (informacion->buffer[3].estado == 1)
         {
             printf("Entre a WM\n");
-            etapaWB(informacion,instruccionEjecutadas);
+            etapaWB(informacion,INTRUCCIONESEJECUTADAS);
         }
 
         if (informacion->buffer[2].estado == 1)
         {
             printf("Entre a MEM\n");
             hazarDatoMEM(informacion);  
-            etapaMEM(informacion,instruccionEjecutadas);        
+            etapaMEM(informacion,INTRUCCIONESEJECUTADAS);        
         }
 
         if (informacion->buffer[1].estado == 1)
         {
             printf("Entre a EX\n");
             hazarDatoEx(informacion);
-            etapaEX(informacion,instruccionEjecutadas);            
+            etapaEX(informacion,INTRUCCIONESEJECUTADAS);            
         }
 
         if (informacion->buffer[0].estado == 1)
         {            
             printf("Entre a ID\n");
-            etapaID(informacion,instruccionEjecutadas);
+            etapaID(informacion,INTRUCCIONESEJECUTADAS);
         }
 
-        if (informacion->cantidadDeInstrucciones > instruccionEjecutadas)
+        if (informacion->cantidadDeInstrucciones > INTRUCCIONESEJECUTADAS)
         {
             printf("Entre a IF\n");
             if (is_nop(informacion) == 1 )
             {
-                etapaIF(informacion,nob,instruccionEjecutadas);
+                etapaIF(informacion,nob,INTRUCCIONESEJECUTADAS);
+            }
+
+            else if ( strcmp(informacion->buffer[1].instruccion->instruccion , "j" ) == 0 )
+            {
+                etapaIF(informacion,nob,INTRUCCIONESEJECUTADAS);
             }
 
             else
             {
                 printf("%d\n", i);
-                etapaIF(informacion,&informacion->instrucciones[instruccionEjecutadas],instruccionEjecutadas);
-                instruccionEjecutadas++;
+                etapaIF(informacion,&informacion->instrucciones[INTRUCCIONESEJECUTADAS],INTRUCCIONESEJECUTADAS);
+                INTRUCCIONESEJECUTADAS++;
             }
         }
 
-        else if (informacion->cantidadDeInstrucciones <= instruccionEjecutadas)
+        else if (informacion->cantidadDeInstrucciones <= INTRUCCIONESEJECUTADAS)
         {
-            etapaIF(informacion,nob,instruccionEjecutadas);
-            instruccionEjecutadas++;
+            etapaIF(informacion,nob,INTRUCCIONESEJECUTADAS);
+            INTRUCCIONESEJECUTADAS++;
         }
+
         escribirArchivoTraza(informacion ,ciclo);
         escribirArchivoHazar(informacion,ciclo);
         ciclo++;
@@ -1628,13 +1674,13 @@ void etapaIF(Informacion *info, Instruccion *instruccion , int PC)
         addi(info,instruccion,PC, 1);
     }
 
-    /*//Instruccion 3
+    //Instruccion 3
     else if(!strcmp(instruccion->instruccion,"j"))
     {
         jump(info,instruccion,PC,1);
     }
 
-    //Instruccion 4
+    /*//Instruccion 4
     else if(!strcmp(instruccion->instruccion,"beq"))
     {
         beq(info,instruccion,PC,1);
@@ -1684,14 +1730,13 @@ void etapaID(Informacion *info, int PC)
     }
 
 
-    /*//Instruccion 3
+    //Instruccion 3
     else if(!strcmp(info->buffer[0].instruccion->instruccion,"j"))
     {
         jump(info,info->buffer[0].instruccion,PC,2);
-        flushBuffer(info,0);
     }
 
-    //Instruccion 4
+    /*//Instruccion 4
     else if(!strcmp(info->buffer[0].instruccion->instruccion,"beq"))
     {
         beq(info,info->buffer[0].instruccion,PC,2);
@@ -1741,14 +1786,13 @@ void etapaEX(Informacion *info, int PC)
         mul(info,info->buffer[1].instruccion,PC,3);
     }
 
-    /*//Instruccion 3
+    //Instruccion 3
     else if(!strcmp(info->buffer[1].instruccion->instruccion,"j"))
     {
         jump(info,info->buffer[1].instruccion,PC,3);
-        //flushBuffer(info,1);
     }
 
-    //Instruccion 4
+    /*//Instruccion 4
     else if(!strcmp(info->buffer[1].instruccion->instruccion,"beq"))
     {
         beq(info,info->buffer[1].instruccion,PC,3);
@@ -1809,14 +1853,13 @@ void etapaMEM(Informacion *info, int PC)
         mul(info,info->buffer[2].instruccion,PC,4);
     }
 
-    /*//Instruccion 2
+    //Instruccion 2
     else if(!strcmp(info->buffer[2].instruccion->instruccion,"j"))
     {
         jump(info,info->buffer[2].instruccion,PC,4);
-        //flushBuffer(info,2);
     }
 
-    //Instruccion 4
+    /*//Instruccion 4
     else if(!strcmp(info->buffer[2].instruccion->instruccion,"beq"))
     {
         beq(info,info->buffer[2].instruccion,PC,4);
@@ -1883,14 +1926,13 @@ void etapaWB(Informacion *info, int PC)
         mul(info,info->buffer[3].instruccion,PC,5);
     }
 
-    /*//Instruccion 3
+    //Instruccion 3
     else if(!strcmp(info->buffer[3].instruccion->instruccion,"j"))
     {
         jump(info,info->buffer[3].instruccion,PC,5);
-        //flushBuffer(info,3);
     }
 
-    //Instruccion 3
+    /*//Instruccion 3
     else if(!strcmp(info->buffer[3].instruccion->instruccion,"beq"))
     {
         beq(info,info->buffer[3].instruccion,PC,5);
@@ -1996,6 +2038,11 @@ void escribirArchivoTraza(Informacion* informacion, int ciclo)
         {
             fprintf (archivo, "%s %s %d(%s) ;",informacion->buffer[i].instruccion->instruccion,informacion->buffer[i].instruccion->rt, informacion->buffer[i].instruccion->inmediato ,
             informacion->buffer[i].instruccion->rs);
+        }
+
+        else if (!strcmp(informacion->buffer[i].instruccion->instruccion,"j") ) 
+        {
+            fprintf (archivo, "%s %s ;",informacion->buffer[i].instruccion->instruccion,informacion->buffer[i].instruccion->rd);
         }
 
         else if (

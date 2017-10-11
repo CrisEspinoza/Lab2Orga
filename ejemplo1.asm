@@ -4,4 +4,11 @@ add $t0, $t0, $t5
 addi $t2, $zero, 3
 sub $t3, $t2, $t1
 END:
-addi $s0, $t2, 1
+lw $t1, 0($sp)
+add $t0, $t1, $t5
+j FIN
+addi $t2, $zero, 3
+sub $t3, $t2, $t1
+FIN:
+lw $t1, 0($sp)
+add $t0, $t1, $t5
