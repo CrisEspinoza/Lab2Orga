@@ -430,7 +430,7 @@ void add(Informacion *informacion, Instruccion *instruccion, int PC,int etapa) /
     {   
         informacion->buffer[0].estado = 1;
         informacion->buffer[0].instruccion = instruccion;
-        informacion->buffer[0].addPc = PC++;
+        informacion->buffer[0].addPc = PC;
 
         printf("Instruccion IF/ID: %s \n", informacion->buffer[0].instruccion->instruccion);
     }
@@ -516,7 +516,7 @@ void sub(Informacion *informacion, Instruccion *instruccion, int PC,int etapa) /
     {   
         informacion->buffer[0].estado = 1;
         informacion->buffer[0].instruccion = instruccion;
-        informacion->buffer[0].addPc = PC++;
+        informacion->buffer[0].addPc = PC;
 
         printf("Instruccion IF/ID: %s \n", informacion->buffer[0].instruccion->instruccion);
     }
@@ -600,7 +600,7 @@ void mul(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     if(etapa == 1) // ETAPA IF buffers[0] = IF/ID
     {   
         informacion->buffer[0].instruccion = instruccion;
-        informacion->buffer[0].addPc = PC++;
+        informacion->buffer[0].addPc = PC;
         informacion->buffer[0].estado = 1;
 
         printf("Instruccion IF/ID: %s \n", informacion->buffer[0].instruccion->instruccion);
@@ -674,7 +674,7 @@ void vacio(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     {   
         //resetearBuffer(&informacion->buffer[0]);
         informacion->buffer[0].instruccion = instruccion;
-        informacion->buffer[0].addPc = PC++;
+        informacion->buffer[0].addPc = PC;
         informacion->buffer[0].estado = 1;
         printf("Instruccion IF/ID: %s \n", informacion->buffer[0].instruccion->instruccion);
     }
@@ -747,7 +747,7 @@ void division(Informacion *informacion, Instruccion *instruccion, int PC,int eta
     if(etapa == 1) // ETAPA IF buffers[0] = IF/ID
     {   
         informacion->buffer[0].instruccion = instruccion;
-        informacion->buffer[0].addPc = PC++;
+        informacion->buffer[0].addPc = PC;
         informacion->buffer[0].estado = 1;
 
         printf("Instruccion IF/ID: %s \n", informacion->buffer[0].instruccion->instruccion);
@@ -835,7 +835,7 @@ void subi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     if(etapa == 1) // ETAPA IF buffers[0] = IF/ID
     {   
         informacion->buffer[0].instruccion = instruccion;
-        informacion->buffer[0].addPc = PC++;
+        informacion->buffer[0].addPc = PC;
         informacion->buffer[0].estado = 1;
 
         printf("Instruccion IF/ID: %s \n", informacion->buffer[0].instruccion->instruccion);
@@ -922,7 +922,7 @@ void addi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     if(etapa == 1) // ETAPA IF buffers[0] = IF/ID
     {   
         informacion->buffer[0].instruccion = instruccion;
-        informacion->buffer[0].addPc = PC++;
+        informacion->buffer[0].addPc = PC;
         informacion->buffer[0].estado = 1;
 
         printf("Instruccion IF/ID: %s \n", informacion->buffer[0].instruccion->instruccion);
@@ -1059,7 +1059,7 @@ void lw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     if(etapa == 1) // ETAPA IF buffers[0] = IF/ID
     {   
         informacion->buffer[0].instruccion = instruccion;
-        informacion->buffer[0].addPc = PC++;
+        informacion->buffer[0].addPc = PC;
         informacion->buffer[0].estado = 1;
 
         printf("Instruccion IF/ID: %s \n", informacion->buffer[0].instruccion->instruccion);
@@ -1142,7 +1142,7 @@ void sw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     if(etapa == 1) // ETAPA IF buffers[0] = IF/ID
     {   
         informacion->buffer[0].instruccion = instruccion;
-        informacion->buffer[0].addPc = PC++;
+        informacion->buffer[0].addPc = PC;
         informacion->buffer[0].estado = 1;
 
         printf("Instruccion IF/ID: %s \n", informacion->buffer[0].instruccion->instruccion);
@@ -1541,27 +1541,27 @@ void pipeLine(Informacion *informacion)
         if (informacion->buffer[3].estado == 1)
         {
             printf("Entre a WM\n");
-            etapaWB(informacion,i);
+            etapaWB(informacion,instruccionEjecutadas);
         }
 
         if (informacion->buffer[2].estado == 1)
         {
             printf("Entre a MEM\n");
             hazarDatoMEM(informacion);  
-            etapaMEM(informacion,i);        
+            etapaMEM(informacion,instruccionEjecutadas);        
         }
 
         if (informacion->buffer[1].estado == 1)
         {
             printf("Entre a EX\n");
             hazarDatoEx(informacion);
-            etapaEX(informacion,i);            
+            etapaEX(informacion,instruccionEjecutadas);            
         }
 
         if (informacion->buffer[0].estado == 1)
         {            
             printf("Entre a ID\n");
-            etapaID(informacion,i);
+            etapaID(informacion,instruccionEjecutadas);
         }
 
         if (informacion->cantidadDeInstrucciones > instruccionEjecutadas)
@@ -1569,26 +1569,25 @@ void pipeLine(Informacion *informacion)
             printf("Entre a IF\n");
             if (is_nop(informacion) == 1 )
             {
-                etapaIF(informacion,nob,i);
+                etapaIF(informacion,nob,instruccionEjecutadas);
             }
 
             else
             {
                 printf("%d\n", i);
-                etapaIF(informacion,&informacion->instrucciones[instruccionEjecutadas],i);
+                etapaIF(informacion,&informacion->instrucciones[instruccionEjecutadas],instruccionEjecutadas);
                 instruccionEjecutadas++;
             }
         }
 
         else if (informacion->cantidadDeInstrucciones <= instruccionEjecutadas)
         {
-            etapaIF(informacion,nob,i);
+            etapaIF(informacion,nob,instruccionEjecutadas);
             instruccionEjecutadas++;
         }
         escribirArchivoTraza(informacion ,ciclo);
         escribirArchivoHazar(informacion,ciclo);
         ciclo++;
-        i++;
     }while( chequearBuffer(informacion) != 0 );
 }
 
@@ -1993,7 +1992,7 @@ void escribirArchivoTraza(Informacion* informacion, int ciclo)
             informacion->buffer[i].instruccion->inmediato);
         }
 
-        else if (!strcmp(informacion->buffer[i].instruccion->instruccion,"lw") ) 
+        else if (!strcmp(informacion->buffer[i].instruccion->instruccion,"lw") || !strcmp(informacion->buffer[i].instruccion->instruccion,"sw") ) 
         {
             fprintf (archivo, "%s %s %d(%s) ;",informacion->buffer[i].instruccion->instruccion,informacion->buffer[i].instruccion->rt, informacion->buffer[i].instruccion->inmediato ,
             informacion->buffer[i].instruccion->rs);
@@ -2004,20 +2003,7 @@ void escribirArchivoTraza(Informacion* informacion, int ciclo)
         )
         {
             fprintf (archivo, " ;");
-        }
-
-        else if ( !strcmp(informacion->buffer[i].instruccion->instruccion,"sw"))
-        {
-            if (i < 4 )
-            {
-                fprintf (archivo, "%s %s %d(%s) ;",informacion->buffer[i].instruccion->instruccion,informacion->buffer[i].instruccion->rt, informacion->buffer[i].instruccion->inmediato ,
-                informacion->buffer[i].instruccion->rs);
-            }
-            else
-            {
-                fprintf (archivo, " - ;");   
-            }
-        }        
+        }       
     }
 
     fprintf(archivo, "\n");
