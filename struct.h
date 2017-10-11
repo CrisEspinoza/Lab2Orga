@@ -106,6 +106,7 @@ typedef struct Informacion
 	Label etiqueta[100];
 	int memoria[1000];
 	Buffer* buffer;
+	char* hazarDato;
 
 }Informacion;
 
@@ -148,4 +149,7 @@ void etapaWB(Informacion *info, int PC);
 int chequearBuffer(Informacion* informacion);
 void vacio(Informacion *informacion, Instruccion *instruccion, int PC,int etapa);
 void fordwarding(Informacion *informacion);
-int escribirArchivo(Informacion* informacion, int ciclo);
+void escribirArchivoTraza(Informacion* informacion, int ciclo);
+void escribirArchivoHazar(Informacion* informacion, int ciclo);
+void hazarDatoMEM( Informacion* informacion );
+void hazarDatoEx( Informacion* informacion );
