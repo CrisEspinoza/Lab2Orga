@@ -107,6 +107,7 @@ typedef struct Informacion
 	int memoria[1000];
 	Buffer* buffer;
 	char* hazarDato;
+	char* hazarControl;
 
 }Informacion;
 
@@ -130,7 +131,7 @@ int jump(Informacion *informacion, Instruccion *instruccion, int PC, int etapa);
 int buscarPosicionEtiqueta(char* etiqueta, Informacion *info);
 void sw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa);
 void lw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa);
-int beq(Informacion *info, Instruccion *instruccion);
+int beq(Informacion *informacion, Instruccion *instruccion, int PC, int etapa);
 void mostrarLineasDeControl(Lista* lista);
 void mostrar(Instruccion* lista, int largo);
 void realizarSalida(Lista* lista,LineaDeControl* lineasControlDadas);
@@ -141,7 +142,7 @@ void etapaIF(Informacion *info, Instruccion *instruccion, int PC);
 Instruccion* inicializarIntrucciones(Instruccion* instruccion);
 void mostrarLineasControl(LineaDeControl* aux);
 Instruccion* resetearInstruccion(Instruccion* instruccion);
-void resetearBuffer(Informacion* informacion);
+void resetearBuffer(Informacion* informacion, int i);
 void etapaID(Informacion *info, int PC);
 void etapaEX(Informacion *info,int PC);
 void etapaMEM(Informacion *info, int PC);
