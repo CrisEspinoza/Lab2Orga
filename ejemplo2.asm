@@ -1,6 +1,6 @@
-beq $t0,$t1,END
+beq $t0,$s1,END
 lw $t2, 0($sp)
-addi $t2, $zero, 3
+addi $t4, $zero, 3
 sub $t3, $t2, $t1
 addi $t2, $zero, 3
 sub $t3, $t2, $t1

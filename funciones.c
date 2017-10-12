@@ -6,6 +6,7 @@
 
 
 int INTRUCCIONESEJECUTADAS = 0;
+int BANDERA = 0;
 
 // Funciones que leen los archivos
 
@@ -1098,17 +1099,6 @@ int beq(Informacion *informacion, Instruccion *instruccion, int PC, int etapa)
         printf("%d \n", informacion->buffer[2].readData2Id );
         informacion->buffer[2].zero = informacion->buffer[2].readData1Id - informacion->buffer[2].readData2Id;
 
-        if (informacion->buffer[2].zero == 0 )
-        {
-            char *etiqueta = (char*)malloc(sizeof(char)*100);
-            strcpy(etiqueta,informacion->buffer[2].instruccion->rd);
-            strcat(etiqueta,":");
-            posrd = buscarPosicionEtiqueta(etiqueta, informacion);
-            resetearBuffer(informacion,0);
-            resetearBuffer(informacion,1);
-            INTRUCCIONESEJECUTADAS = posrd;
-        }
-
         printf("Instruccion EX/MEM: %s %s %s %d \n", informacion->buffer[2].instruccion->instruccion,informacion->buffer[2].instruccion->rt , informacion->buffer[2].instruccion->rs, 
             informacion->buffer[2].instruccion->inmediato);
         printf("El resultado de zero es : %d , el resultado de rd es : %d \n", informacion->buffer[2].zero, posrd );
@@ -1116,9 +1106,20 @@ int beq(Informacion *informacion, Instruccion *instruccion, int PC, int etapa)
 
     else if(etapa == 4) //ETAPA MEM buffers[3] = MEM/WB
     {
+        printf("PREDICION DEL BEQ :O :O :O :O :O :O :O \n");
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
         //Etapa nueva         
+        if (informacion->buffer[3].zero == 0 )
+        {
+            char *etiqueta = (char*)malloc(sizeof(char)*100);
+            strcpy(etiqueta,informacion->buffer[3].instruccion->rd);
+            strcat(etiqueta,":");
+            posrd = buscarPosicionEtiqueta(etiqueta, informacion);
+            INTRUCCIONESEJECUTADAS = posrd;
+            resetearBuffer(informacion,0);
+            resetearBuffer(informacion,1);
+        }
         
         printf("Instruccion MEM/WB: %s %s %s %d \n", informacion->buffer[3].instruccion->instruccion,informacion->buffer[3].instruccion->rt , informacion->buffer[3].instruccion->rs, 
             informacion->buffer[3].instruccion->inmediato);
@@ -1167,8 +1168,9 @@ void lw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[1].rd = informacion->buffer[1].instruccion->rt;
         informacion->buffer[1].signoExtendido = informacion->buffer[1].instruccion->inmediato;
         informacion->buffer[1].lineaDeControl = asignarLineasDeControl(informacion->buffer[1].instruccion->instruccion);
-        informacion->buffer[1].writeRegister = informacion->buffer[0].instruccion->rt;
+        informacion->buffer[1].writeRegister = informacion->buffer[1].instruccion->rt;
         informacion->buffer[1].readData1Id = informacion->registros[posrs];
+        //informacion->buffer[0].instruccion = resetearInstruccion(informacion->buffer[0].instruccion);
 
         printf("Instruccion ID/EX: %s %s %s %d \n", informacion->buffer[1].instruccion->instruccion,informacion->buffer[1].instruccion->rt , informacion->buffer[1].instruccion->rs, 
             informacion->buffer[1].instruccion->inmediato);
@@ -1448,13 +1450,16 @@ LineaDeControl* asignarLineasDeControl (char* instruccion)
 
 int is_nop(Informacion* informacion)
 {
-    printf("Buffer 1 : %s - buffer 2 : %s \n", informacion->buffer[1].rt, informacion->buffer[0].instruccion->rs);
-    printf("Buffer 1 : %s - buffer 2 : %s \n", informacion->buffer[1].rt, informacion->buffer[0].instruccion->rt);
+    printf("%s Buffer 1 : %s - buffer 2 : %s \n",informacion->buffer[1].instruccion->instruccion ,informacion->buffer[1].rd, informacion->buffer[0].instruccion->rs);
+    printf("%s Buffer 1 : %s - buffer 2 : %s \n",informacion->buffer[1].instruccion->instruccion ,informacion->buffer[1].rd, informacion->buffer[0].instruccion->rt);
     printf("%d %d \n", informacion->buffer[0].addPc , informacion->buffer[1].addPc );
+
+    printf("%d %d \n", informacion->buffer[1].addPc , INTRUCCIONESEJECUTADAS);
+    printf("%s %s \n", informacion->buffer[1].instruccion->instruccion , informacion->buffer[0].instruccion->instruccion);
     
-    if( (informacion->buffer[1].lineaDeControl->MemRead == '1' )  && 
-        ( strcmp(informacion->buffer[1].rt , informacion->buffer[0].instruccion->rs ) == 0 || 
-        strcmp( informacion->buffer[1].rt , informacion->buffer[0].instruccion->rt ) == 0 ) )  
+    if( (informacion->buffer[1].lineaDeControl->MemRead == '1' )  &&
+        ( strcmp(informacion->buffer[1].rd , informacion->instrucciones[INTRUCCIONESEJECUTADAS].rs ) == 0 || 
+        strcmp( informacion->buffer[1].rd , informacion->instrucciones[INTRUCCIONESEJECUTADAS].rt ) == 0 ) )  
     {
         return 1;
     }
@@ -1659,6 +1664,7 @@ void pipeLine(Informacion *informacion)
 
         if (informacion->cantidadDeInstrucciones > INTRUCCIONESEJECUTADAS)
         {
+            printf("%s\n",  informacion->instrucciones[INTRUCCIONESEJECUTADAS] );
             printf("Entre a IF\n");
             if (is_nop(informacion) == 1 )
             {
@@ -1684,7 +1690,7 @@ void pipeLine(Informacion *informacion)
             etapaIF(informacion,nob,INTRUCCIONESEJECUTADAS);
             INTRUCCIONESEJECUTADAS++;
         }
-
+        
         escribirArchivoTraza(informacion ,ciclo);
         escribirArchivoHazar(informacion,ciclo);
         ciclo++;
