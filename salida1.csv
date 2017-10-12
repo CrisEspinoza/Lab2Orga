@@ -1,0 +1,12 @@
+Etapas ; IF ;ID ;EX ;MEM ;WB 
+ 1 ;beq $t0 $t1 END; ; ; ; ;
+ 2 ;lw $t2 0($sp) ;beq $t0 $t1 END; ; ; ;
+ 3 ;addi $t4 $zero 3 ;lw $t2 0($sp) ;beq $t0 $t1 END; ; ;
+ 4 ;lw $t3 0($sp) ; ; ;beq $t0 $t1 END; ;
+ 5 ; ;lw $t3 0($sp) ; ; ;beq $t0 $t1 END;
+ 6 ;addi $t3 $zero 3 ; ;lw $t3 0($sp) ; ; ;
+ 7 ;sub $t4 $t5 $t6 ;addi $t3 $zero 3 ; ;lw $t3 0($sp) ; ;
+ 8 ; ;sub $t4 $t5 $t6 ;addi $t3 $zero 3 ; ;lw $t3 0($sp) ;
+ 9 ; ; ;sub $t4 $t5 $t6 ;addi $t3 $zero 3 ; ;
+ 10 ; ; ; ;sub $t4 $t5 $t6 ;addi $t3 $zero 3 ;
+ 11 ; ; ; ; ;sub $t4 $t5 $t6 ;

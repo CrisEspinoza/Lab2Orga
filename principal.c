@@ -50,8 +50,6 @@ int main()
             case 3: system("cls");
                     if (bandera >= 2)
                     { 
-                        printf("Entre\n");
-                        //mostrarBuffer(info->buffer);
                         pipeLine(info);
                     }
                     else
