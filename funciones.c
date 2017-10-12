@@ -1119,6 +1119,7 @@ int beq(Informacion *informacion, Instruccion *instruccion, int PC, int etapa)
             INTRUCCIONESEJECUTADAS = posrd;
             resetearBuffer(informacion,0);
             resetearBuffer(informacion,1);
+            informacion->hazarControl = "H.C";
         }
         
         printf("Instruccion MEM/WB: %s %s %s %d \n", informacion->buffer[3].instruccion->instruccion,informacion->buffer[3].instruccion->rt , informacion->buffer[3].instruccion->rs, 
