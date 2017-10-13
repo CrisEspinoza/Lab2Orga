@@ -5,6 +5,8 @@
 #include "struct.h"
 
 int INTRUCCIONESEJECUTADAS = 0;
+int BANDERA = 0;
+int BANDERA1 = 0;
 
 // Funciones que leen los archivos
 
@@ -202,6 +204,10 @@ void inicializarMemoriaParaInstrucciones(Informacion *informacion, int cantidadL
 
     informacion->instrucciones = (Instruccion*)malloc(sizeof(Instruccion)*cantidadLineas);
     informacion->buffer = (Buffer*)malloc(sizeof(Buffer)*5);
+    informacion->hazarDato = (char*)malloc(sizeof(char)*100);
+    informacion->hazarControl = (char*)malloc(sizeof(char)*100);
+    informacion->hazarDato = "" ;
+    informacion->hazarControl = "" ; 
 
     for (i = 0; i < cantidadLineas; i++)
     {
@@ -211,8 +217,6 @@ void inicializarMemoriaParaInstrucciones(Informacion *informacion, int cantidadL
         informacion->instrucciones[i].rt = (char*)malloc(sizeof(char)*10);
         informacion->instrucciones[i].rs = (char*)malloc(sizeof(char)*10);
         informacion->instrucciones[i].rd = (char*)malloc(sizeof(char)*10);
-        informacion->hazarDato = (char*)malloc(sizeof(char)*100);
-        informacion->hazarControl = (char*)malloc(sizeof(char)*100);
     }
 
     for (i = 0; i < cantidadLineas; i++)
@@ -263,6 +267,7 @@ Instruccion* inicializarIntrucciones(Instruccion* instruccion)
     instruccion->rs = "";
     instruccion->rt = "";
     instruccion->rd = "";
+    instruccion->HC = 0;
 
     return instruccion;
 }
@@ -290,7 +295,8 @@ void iniciarBuffer(Buffer* buffer)
     buffer->zero = 0;
     buffer->aluResult = 0;
     buffer->addPc = 0;
-    buffer->estado = 0;    
+    buffer->estado = 0; 
+    buffer->estado1 = 0;    
 }
 
 void mostrarBuffer(Buffer* buffer)
@@ -448,16 +454,30 @@ void add(Informacion *informacion, Instruccion *instruccion, int PC,int etapa) /
     {
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
-        //Etapa nueva         
-        informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
+        //Etapa nueva   
+        if (BANDERA1 == 0)
+        {      
+            informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
+        }
+        else
+        {
+            BANDERA1--;
+        }
     }
 
     else if(etapa == 5) //ETAPA WB
     {
         informacion->buffer[4] = informacion->buffer[3];
-        // Etapa nueva
         informacion->buffer[3].estado = 0;
-        informacion->registros[posrd] = informacion->buffer[3].writeDataWb;
+        // Etapa nueva
+        if (BANDERA1 == 0)
+        {
+            informacion->registros[posrd] = informacion->buffer[3].writeDataWb;
+        }
+        else
+        {
+            BANDERA1--;
+        }
     }   
 }
 
@@ -513,16 +533,30 @@ void sub(Informacion *informacion, Instruccion *instruccion, int PC,int etapa) /
     {
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
-        //Etapa nueva         
-        informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
+        //Etapa nueva    
+        if (BANDERA1 == 0)
+        {     
+            informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
+        }
+        else
+        {
+            BANDERA1--;
+        }
     }
 
     else if(etapa == 5) //ETAPA WB
     {
         informacion->buffer[4] = informacion->buffer[3];
-        // Etapa nueva
         informacion->buffer[3].estado = 0;
-        informacion->registros[posrd] = informacion->buffer[3].writeDataWb;
+        // Etapa nueva
+        if (BANDERA1 == 0)
+        {
+            informacion->registros[posrd] = informacion->buffer[3].writeDataWb;
+        }
+        else
+        {
+            BANDERA1--;
+        }
     }   
 }
 
@@ -579,8 +613,15 @@ void mul(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     {
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
-        //Etapa nueva         
-        informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
+        //Etapa nueva    
+        if (BANDERA1 == 0)
+        {     
+            informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
+        }
+        else
+        {
+            BANDERA1--;
+        }
     }
 
     else if(etapa == 5) //ETAPA WB
@@ -588,7 +629,14 @@ void mul(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[4] = informacion->buffer[3];
         informacion->buffer[3].estado = 0;
         // Etapa nueva
-        informacion->registros[posrd] = informacion->buffer[3].writeDataWb;
+        if (BANDERA1 == 0)
+        {
+            informacion->registros[posrd] = informacion->buffer[3].writeDataWb;
+        }
+        else
+        {
+            BANDERA1--;
+        }
     }   
 }
 
@@ -631,13 +679,24 @@ void vacio(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
         //Etapa nueva         
-        informacion->buffer[3].writeDataWb = 0;
+        if (BANDERA1 == 0)
+        {
+            informacion->buffer[3].writeDataWb = 0;
+        }
+        else
+        {
+            BANDERA1--;
+        }
     }
 
     else if(etapa == 5) //ETAPA WB
     {
         informacion->buffer[4] = informacion->buffer[3];
         informacion->buffer[3].estado = 0;
+        if (BANDERA1 != 0)
+        {
+            BANDERA1--;
+        }
     }   
 }
 
@@ -693,8 +752,15 @@ void division(Informacion *informacion, Instruccion *instruccion, int PC,int eta
     {
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
-        //Etapa nueva         
-        informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
+        //Etapa nueva       
+        if (BANDERA1 == 0)
+        {  
+            informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
+        }
+        else
+        {
+            BANDERA1--;
+        }
     }
 
     else if(etapa == 5) //ETAPA WB
@@ -702,7 +768,14 @@ void division(Informacion *informacion, Instruccion *instruccion, int PC,int eta
         informacion->buffer[4] = informacion->buffer[3];
         informacion->buffer[3].estado = 0;
         // Etapa nueva
-        informacion->registros[posrd] = informacion->buffer[3].writeDataWb;
+        if (BANDERA1 == 0)
+        {
+            informacion->registros[posrd] = informacion->buffer[3].writeDataWb;
+        }
+        else
+        {
+            BANDERA1--;
+        }
     }   
 }
 
@@ -757,8 +830,15 @@ void subi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     {
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
-        //Etapa nueva         
-        informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
+        //Etapa nueva 
+        if (BANDERA1 == 0)
+        {        
+            informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
+        }
+        else
+        {
+            BANDERA1--;
+        }
     }
 
     else if(etapa == 5) //ETAPA WB
@@ -766,7 +846,14 @@ void subi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[4] = informacion->buffer[3];
         informacion->buffer[3].estado = 0;       
          // Etapa nueva
-        informacion->registros[posrt] = informacion->buffer[3].writeDataWb;
+        if (BANDERA1 == 0)
+        {
+            informacion->registros[posrt] = informacion->buffer[3].writeDataWb;
+        }
+        else
+        {
+            BANDERA1--;
+        }
     }   
 }
 
@@ -820,8 +907,15 @@ void addi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     {
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
-        //Etapa nueva         
-        informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
+        //Etapa nueva   
+        if (BANDERA1 == 0)
+        {      
+            informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
+        }
+        else
+        {
+            BANDERA1--;
+        }
     }
 
     else if(etapa == 5) //ETAPA WB
@@ -829,7 +923,14 @@ void addi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[4] = informacion->buffer[3];
         informacion->buffer[3].estado = 0;
         // Etapa nueva
-        informacion->registros[posrt] = informacion->buffer[3].writeDataWb;
+        if (BANDERA1 == 0)
+        {
+            informacion->registros[posrt] = informacion->buffer[3].writeDataWb;
+        }
+        else
+        {
+            BANDERA1--;
+        }
     }   
 }
 
@@ -875,12 +976,20 @@ int jump(Informacion *informacion, Instruccion *instruccion, int PC, int etapa)
     {
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
+        if (BANDERA1 != 0)
+        {
+            BANDERA1--;
+        }
     }
 
     else if(etapa == 5) //ETAPA WB
     {
         informacion->buffer[4] = informacion->buffer[3];
         informacion->buffer[3].estado = 0;
+        if (BANDERA1 != 0)
+        {
+            BANDERA1--;
+        }
     } 
 }
 
@@ -933,17 +1042,26 @@ int beq(Informacion *informacion, Instruccion *instruccion, int PC, int etapa)
     {
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
-        //Etapa nueva         
-        if (informacion->buffer[3].zero == 0 )
+        //Etapa nueva   
+        if (BANDERA1 == 0)
+        {      
+            if (informacion->buffer[3].zero == 0 )
+            {
+                char *etiqueta = (char*)malloc(sizeof(char)*100);
+                strcpy(etiqueta,informacion->buffer[3].instruccion->rd);
+                strcat(etiqueta,":");
+                posrd = buscarPosicionEtiqueta(etiqueta, informacion);
+                informacion->instrucciones[informacion->buffer[1].addPc].HC = 1;            
+                informacion->instrucciones[informacion->buffer[2].addPc].HC = 1;
+                INTRUCCIONESEJECUTADAS = posrd;
+                informacion->hazarControl = "H.C";
+                BANDERA1 = 4;
+                BANDERA = 1;
+            }
+        }
+        else
         {
-            char *etiqueta = (char*)malloc(sizeof(char)*100);
-            strcpy(etiqueta,informacion->buffer[3].instruccion->rd);
-            strcat(etiqueta,":");
-            posrd = buscarPosicionEtiqueta(etiqueta, informacion);
-            INTRUCCIONESEJECUTADAS = posrd;
-            resetearBuffer(informacion,0);
-            resetearBuffer(informacion,1);
-            informacion->hazarControl = "H.C";
+            BANDERA1--;
         }
     }
 
@@ -951,6 +1069,10 @@ int beq(Informacion *informacion, Instruccion *instruccion, int PC, int etapa)
     {
         informacion->buffer[4] = informacion->buffer[3];
         informacion->buffer[3].estado = 0;
+        if (BANDERA1 != 0)
+        {
+            BANDERA1--;
+        }
     }  
 }
 
@@ -1004,8 +1126,15 @@ void lw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     {
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
-        //Etapa nueva         
-        informacion->buffer[3].writeDataWb = informacion->memoria[informacion->buffer[3].aluResult];
+        //Etapa nueva      
+        if (BANDERA1 == 0)
+        {   
+            informacion->buffer[3].writeDataWb = informacion->memoria[informacion->buffer[3].aluResult];
+        }
+        else
+        {
+            BANDERA1--;
+        }
     }
 
     else if(etapa == 5) //ETAPA WB
@@ -1013,7 +1142,14 @@ void lw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[4] = informacion->buffer[3];
         informacion->buffer[3].estado = 0;
         // Etapa nueva
-        informacion->registros[posrt] = informacion->buffer[3].writeDataWb;
+        if (BANDERA1 == 0)
+        {
+            informacion->registros[posrt] = informacion->buffer[3].writeDataWb;
+        }
+        else
+        {
+            BANDERA1--;
+        }
     }   
 }
 
@@ -1066,8 +1202,15 @@ void sw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     {
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
-        //Etapa nueva         
-        informacion->memoria[informacion->buffer[3].aluResult] = informacion->registros[informacion->buffer[3].posRegistro];
+        //Etapa nueva   
+        if (BANDERA1 == 0)
+        {      
+            informacion->memoria[informacion->buffer[3].aluResult] = informacion->registros[informacion->buffer[3].posRegistro];
+        }
+        else
+        {
+            BANDERA1--;
+        }
     }
 
     else if(etapa == 5) //ETAPA WB
@@ -1075,6 +1218,10 @@ void sw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[4] = informacion->buffer[3];
         informacion->buffer[3].estado = 0;
         //No ocupe esta etapa
+        if(BANDERA1 != 0)
+        {
+            BANDERA1--;
+        }
     }   
 }
 
@@ -1403,6 +1550,13 @@ void pipeLine(Informacion *informacion)
         {
             etapaIF(informacion,nob,INTRUCCIONESEJECUTADAS);
             INTRUCCIONESEJECUTADAS++;
+        }
+
+        if (BANDERA == 1)
+        {
+            informacion->buffer[1].estado1 = 1;
+            informacion->buffer[2].estado1 = 1;
+            BANDERA = 0;
         }
         
         escribirArchivoTraza(informacion ,ciclo);
@@ -1735,49 +1889,58 @@ void escribirArchivoTraza(Informacion* informacion, int ciclo)
 
     for (i = 0; i < 5; i++)
     {
-        if  (
-        !strcmp(informacion->buffer[i].instruccion->instruccion,"add") ||
-        !strcmp(informacion->buffer[i].instruccion->instruccion,"sub") ||
-        !strcmp(informacion->buffer[i].instruccion->instruccion,"mul") ||
-        !strcmp(informacion->buffer[i].instruccion->instruccion,"div")
-        )
+        if (informacion->buffer[i].estado1 == 0)
         {
-            fprintf (archivo, "%s %s %s %s ;",informacion->buffer[i].instruccion->instruccion,informacion->buffer[i].instruccion->rd, informacion->buffer[i].instruccion->rs ,
-            informacion->buffer[i].instruccion->rt);
+            if  (
+            !strcmp(informacion->buffer[i].instruccion->instruccion,"add") ||
+            !strcmp(informacion->buffer[i].instruccion->instruccion,"sub") ||
+            !strcmp(informacion->buffer[i].instruccion->instruccion,"mul") ||
+            !strcmp(informacion->buffer[i].instruccion->instruccion,"div")
+            )
+            {
+                fprintf (archivo, "%s %s %s %s ;",informacion->buffer[i].instruccion->instruccion,informacion->buffer[i].instruccion->rd, informacion->buffer[i].instruccion->rs ,
+                informacion->buffer[i].instruccion->rt);
+            }
+
+            else if (
+            !strcmp(informacion->buffer[i].instruccion->instruccion,"addi") ||
+            !strcmp(informacion->buffer[i].instruccion->instruccion,"subi")
+            )
+            {
+                fprintf (archivo, "%s %s %s %d ;",informacion->buffer[i].instruccion->instruccion,informacion->buffer[i].instruccion->rt, informacion->buffer[i].instruccion->rs ,
+                informacion->buffer[i].instruccion->inmediato);
+            }
+
+            else if (!strcmp(informacion->buffer[i].instruccion->instruccion,"lw") || !strcmp(informacion->buffer[i].instruccion->instruccion,"sw") ) 
+            {
+                fprintf (archivo, "%s %s %d(%s) ;",informacion->buffer[i].instruccion->instruccion,informacion->buffer[i].instruccion->rt, informacion->buffer[i].instruccion->inmediato ,
+                informacion->buffer[i].instruccion->rs);
+            }
+
+            else if (!strcmp(informacion->buffer[i].instruccion->instruccion,"j") ) 
+            {
+                fprintf (archivo, "%s %s ;",informacion->buffer[i].instruccion->instruccion,informacion->buffer[i].instruccion->rd);
+            }
+
+            else if (!strcmp(informacion->buffer[i].instruccion->instruccion,"beq") ) 
+            {
+                fprintf (archivo, "%s %s %s %s;",informacion->buffer[i].instruccion->instruccion,informacion->buffer[i].instruccion->rs, informacion->buffer[i].instruccion->rt, 
+                    informacion->buffer[i].instruccion->rd);
+            }
+
+            else if (
+            !strcmp(informacion->buffer[i].instruccion->instruccion,"vacio") 
+            )
+            {
+                fprintf (archivo, " ;");
+            }       
         }
 
-        else if (
-        !strcmp(informacion->buffer[i].instruccion->instruccion,"addi") ||
-        !strcmp(informacion->buffer[i].instruccion->instruccion,"subi")
-        )
-        {
-            fprintf (archivo, "%s %s %s %d ;",informacion->buffer[i].instruccion->instruccion,informacion->buffer[i].instruccion->rt, informacion->buffer[i].instruccion->rs ,
-            informacion->buffer[i].instruccion->inmediato);
-        }
-
-        else if (!strcmp(informacion->buffer[i].instruccion->instruccion,"lw") || !strcmp(informacion->buffer[i].instruccion->instruccion,"sw") ) 
-        {
-            fprintf (archivo, "%s %s %d(%s) ;",informacion->buffer[i].instruccion->instruccion,informacion->buffer[i].instruccion->rt, informacion->buffer[i].instruccion->inmediato ,
-            informacion->buffer[i].instruccion->rs);
-        }
-
-        else if (!strcmp(informacion->buffer[i].instruccion->instruccion,"j") ) 
-        {
-            fprintf (archivo, "%s %s ;",informacion->buffer[i].instruccion->instruccion,informacion->buffer[i].instruccion->rd);
-        }
-
-        else if (!strcmp(informacion->buffer[i].instruccion->instruccion,"beq") ) 
-        {
-            fprintf (archivo, "%s %s %s %s;",informacion->buffer[i].instruccion->instruccion,informacion->buffer[i].instruccion->rs, informacion->buffer[i].instruccion->rt, 
-                informacion->buffer[i].instruccion->rd);
-        }
-
-        else if (
-        !strcmp(informacion->buffer[i].instruccion->instruccion,"vacio") 
-        )
+        else
         {
             fprintf (archivo, " ;");
-        }       
+        }
+
     }
 
     fprintf(archivo, "\n");

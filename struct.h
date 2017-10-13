@@ -41,6 +41,7 @@ typedef struct Instruccion
 	char *rd;
 	int inmediato;
 	int PC;
+	int HC;
 	LineaDeControl* lineaDeControl;
 
 }Instruccion;
@@ -49,6 +50,7 @@ typedef struct Instruccion
 typedef struct Buffer
 {
 	int estado;
+	int estado1;
 	Instruccion* instruccion;
 	LineaDeControl* lineaDeControl;
 	char* muxRegDs;
