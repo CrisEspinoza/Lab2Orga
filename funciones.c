@@ -4,6 +4,10 @@
 #include <locale.h>
 #include "struct.h"
 
+/* Se declaran variables globales, con el fin de ir guardando banderas al momento de obtener un Hazar de control y 
+el PC de la instrucción en la cual se va.
+*/
+
 int INTRUCCIONESEJECUTADAS = 0;
 int BANDERA = 0;
 int BANDERA1 = 0;
@@ -246,6 +250,11 @@ void inicializarMemoriaParaInstrucciones(Informacion *informacion, int cantidadL
     }
 }
 
+/*
+- Entrada: Recibe como parametro una estructura linea de control de una instrucción.
+- Salida: Entrega una linea de control.
+- Procedimiento: Se encarga de resetear toda las lineas de control en 0.
+ */
 LineaDeControl* resetearLineasControl(LineaDeControl* lineaDeControl)
 {
     lineaDeControl->RegDst = '0';
@@ -261,6 +270,12 @@ LineaDeControl* resetearLineasControl(LineaDeControl* lineaDeControl)
     return lineaDeControl;
 }
 
+/*
+- Entrada: Recibe como parametro una estructura instrucción.
+- Salida: Entrega como salida una estructura instrucción.
+- Procedimiento: Se encarga de resetear la instrucción y dejarla como vacio.
+ */
+
 Instruccion* inicializarIntrucciones(Instruccion* instruccion)
 {
     instruccion->instruccion = "vacio";
@@ -271,6 +286,11 @@ Instruccion* inicializarIntrucciones(Instruccion* instruccion)
 
     return instruccion;
 }
+/*
+- Entrada: Recibe como parametro una estructura buffer.
+- Salida: -
+- Procedimiento: Se encarga de inicializar todo sus valores en 0 y vacio en caso de string.
+ */
 
 void iniciarBuffer(Buffer* buffer)
 {
@@ -298,6 +318,12 @@ void iniciarBuffer(Buffer* buffer)
     buffer->estado = 0; 
     buffer->estado1 = 0;    
 }
+
+/*
+- Entrada: Recibe como parametro una estructura buffer.
+- Salida: -
+- Procedimiento: Se encarga de mostrar cada información que contiene el buffer.
+ */
 
 void mostrarBuffer(Buffer* buffer)
 {
@@ -388,6 +414,12 @@ int buscarPosicionEtiqueta(char* etiqueta, Informacion *info)
     return -1;
 }
 
+/*
+- Entrada: Recibe como parametro una estructura linea de control.
+- Salida: -
+- Procedimiento: Se encarga de mostrar cada uno de los valores que contiene la estrucutra linea de control.
+ */
+
 void mostrarLineasControl(LineaDeControl* aux)
 { 
     printf("Lineas de control \n");
@@ -403,7 +435,8 @@ void mostrarLineasControl(LineaDeControl* aux)
 }
 
 /*
-- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion y la instruccion que se desea trabajar.
+- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion , la instruccion que se desea trabajar, el PC de la intrucción y la etapa en la que se
+esta desarollando.
 - Salida: -
 - Procedimiento: Modifica el puntero a la estructura informacion, tomando los registros rs y rt y realizando la suma de ellos 
 y asi guardando el resultado en rd.
@@ -482,7 +515,8 @@ void add(Informacion *informacion, Instruccion *instruccion, int PC,int etapa) /
 }
 
 /*
-- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion y la instruccion que se desea trabajar.
+- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion , la instruccion que se desea trabajar, el PC de la intrucción y la etapa en la que se
+esta desarollando.
 - Salida: -
 - Procedimiento: Modifica el puntero a la estructura informacion, tomando los registros rs y rt y realizando la resta de ellos 
 y asi guardando el resultado en rd.
@@ -561,7 +595,8 @@ void sub(Informacion *informacion, Instruccion *instruccion, int PC,int etapa) /
 }
 
 /*
-- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion y la instruccion que se desea trabajar.
+- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion , la instruccion que se desea trabajar, el PC de la intrucción y la etapa en la que se
+esta desarollando.
 - Salida: -
 - Procedimiento: Modifica el puntero a la estructura informacion, tomando los registros rs y rt y realizando la multiplicacíon de ellos 
 y asi guardando el resultado en rd.
@@ -640,6 +675,13 @@ void mul(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
     }   
 }
 
+/*
+- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion , la instruccion que se desea trabajar, el PC de la intrucción y la etapa en la que se
+esta desarollando.
+- Salida: -
+- Procedimiento: Modifica el puntero a la estructura informacion, agregando una instrucción vacia, lo cua representa un noob.
+ */
+
 void vacio(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
 {           
     if(etapa == 1) // ETAPA IF buffers[0] = IF/ID
@@ -701,7 +743,8 @@ void vacio(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
 }
 
 /*
-- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion y la instruccion que se desea trabajar.
+- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion , la instruccion que se desea trabajar, el PC de la intrucción y la etapa en la que se
+esta desarollando.
 - Salida: -
 - Procedimiento: Modifica el puntero a la estructura informacion, tomando los registros rs y rt y realizando la division de ellos 
 y asi guardando el resultado en rd.
@@ -780,7 +823,8 @@ void division(Informacion *informacion, Instruccion *instruccion, int PC,int eta
 }
 
 /*
-- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion y la instruccion que se desea trabajar.
+- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion , la instruccion que se desea trabajar, el PC de la intrucción y la etapa en la que se
+esta desarollando.
 - Salida: -
 - Procedimiento: Modifica el puntero a la estructura informacion, tomando los registros rs y inmediato y realizando la resta de ellos 
 y asi guardando el resultado en rd.
@@ -858,7 +902,8 @@ void subi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
 }
 
 /*
-- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion y la instruccion que se desea trabajar.
+- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion , la instruccion que se desea trabajar, el PC de la intrucción y la etapa en la que se
+esta desarollando.
 - Salida: -
 - Procedimiento: Modifica el puntero a la estructura informacion, tomando los registros rs y inmediato y realizando la suma de ellos 
 y asi guardando el resultado en rd.
@@ -935,13 +980,14 @@ void addi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
 }
 
 /*
-- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion y la instruccion que se desea trabajar.
+- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion , la instruccion que se desea trabajar, el PC de la intrucción y la etapa en la que se
+esta desarollando.
 - Salida: Entrega el valor de donde debe realizar el salto la funcion.
 - Procedimiento: Se encarga de concatenar el nombre del label con un ':', para que asi luego ocupe el llamado a la funcion 
 buscarPosicionEtiqueta y entregue el numero de donde se encuentra
  */
 
-int jump(Informacion *informacion, Instruccion *instruccion, int PC, int etapa)
+void jump(Informacion *informacion, Instruccion *instruccion, int PC, int etapa)
 {   
 
     if(etapa == 1) // ETAPA IF buffers[0] = IF/ID
@@ -994,13 +1040,14 @@ int jump(Informacion *informacion, Instruccion *instruccion, int PC, int etapa)
 }
 
 /*
-- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion y la instruccion que se desea trabajar.
+- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion , la instruccion que se desea trabajar, el PC de la intrucción y la etapa en la que se
+esta desarollando.
 - Salida: Entrega un 1 si se cumple la condicion y un 0 si esta no se cumple.
 - Procedimiento: Se encarga de verificar si la condición de los registro se cumple o no, para asi tomar la decision
 del valor a que retornara.
  */
 
-int beq(Informacion *informacion, Instruccion *instruccion, int PC, int etapa)
+void beq(Informacion *informacion, Instruccion *instruccion, int PC, int etapa)
 {            
     int posrt;
     int posrs;
@@ -1077,7 +1124,8 @@ int beq(Informacion *informacion, Instruccion *instruccion, int PC, int etapa)
 }
 
 /*
-- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion y la instruccion que se desea trabajar.
+- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion , la instruccion que se desea trabajar, el PC de la intrucción y la etapa en la que se
+esta desarollando.
 - Salida: -
 - Procedimiento: Modifica el puntero a la estructura informacion, tomando los registros inmediato y la direccion, para asi luego buscar
 el valor del registro con dicho valor y asi guardarlo en el registro correspondiente.
@@ -1154,7 +1202,8 @@ void lw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
 }
 
 /*
-- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion y la instruccion que se desea trabajar.
+- Entrada: Funcion que recibe como parametro un puntero a la estructura informacion , la instruccion que se desea trabajar, el PC de la intrucción y la etapa en la que se
+esta desarollando.
 - Salida: -
 - Procedimiento: Modifica el puntero a la estructura informacion, tomando los registros inmediato y la direccion, para asi luego buscar
 el valor del registro con dicho valor y asi guardarlo en la memoria correspondiente.
@@ -1376,6 +1425,12 @@ LineaDeControl* asignarLineasDeControl (char* instruccion)
     return aux;
 }
 
+/*
+- Entrada: Funcion que recibe como parametro una estructura informacion.
+- Salida: Entrega como salida un 1 si se cumple la condición, o en caso contratio un 0.
+- Procedimiento: Se encarga de verificar si existe la necesidad de colocar un nop.
+ */
+
 int is_nop(Informacion* informacion)
 {
     if( (informacion->buffer[1].lineaDeControl->MemRead == '1' )  &&
@@ -1391,6 +1446,12 @@ int is_nop(Informacion* informacion)
     }
 }
 
+/*
+- Entrada: Funcion que recibe como parametro una estructura informacion.
+- Salida: -.
+- Procedimiento: Se encarga de verificar si existe un hazar de dato en la etapa EX.
+ */
+
 void hazarDatoEx( Informacion* informacion ) 
 {
 
@@ -1403,9 +1464,15 @@ void hazarDatoEx( Informacion* informacion )
     if ( informacion->buffer[2].lineaDeControl->RegWrite == '1' && strcmp(informacion->buffer[2].rd , informacion->buffer[1].rt) == 0 )
     {
         informacion->hazarDato = informacion->buffer[2].rd; 
-        informacion->buffer[1].readData1Id = informacion->buffer[2].aluResult;
+        informacion->buffer[1].readData2Id = informacion->buffer[2].aluResult;
     }
 }
+
+/*
+- Entrada: Funcion que recibe como parametro una estructura informacion.
+- Salida: -.
+- Procedimiento: Se encarga de verificar si existe un hazar de dato en la etapa MEN.
+ */
 
 void hazarDatoMEM( Informacion* informacion ) 
 {
@@ -1431,16 +1498,22 @@ void hazarDatoMEM( Informacion* informacion )
 
         if(informacion->buffer[3].lineaDeControl->MemRead == '1' )
         {
-            informacion->buffer[1].readData1Id = informacion->buffer[3].readData1Mem;
+            informacion->buffer[1].readData2Id = informacion->buffer[3].readData1Mem;
         }
 
         else
         {
-            informacion->buffer[1].readData1Id = informacion->buffer[3].aluResult;
+            informacion->buffer[1].readData2Id = informacion->buffer[3].aluResult;
         }
     }
 
 }
+
+/*
+- Entrada: Funcion que recibe como parametro una estructura instruccion.
+- Salida: Entrega un puntero a instruccion que se encarga de resetarla.
+- Procedimiento: Se encarga de resetear la instruccioón y dejarla como un nop.
+ */
 
 Instruccion* resetearInstruccion(Instruccion* instruccion)
 {
@@ -1449,6 +1522,12 @@ Instruccion* resetearInstruccion(Instruccion* instruccion)
     instruccion->rt = "" ;
     instruccion->rd = "" ;
 }
+
+/*
+- Entrada: Funcion que recibe como parametro una estructura informacion y un numer entero ue indica la etapa en la que esta.
+- Salida: -.
+- Procedimiento: Se encarga de resetear el buffer.
+ */
 
 void resetearBuffer(Informacion* informacion, int i)
 {
@@ -1475,6 +1554,12 @@ void resetearBuffer(Informacion* informacion, int i)
     informacion->buffer[i].muxRegDs = "";
 }
 
+/*
+- Entrada: Funcion que recibe como parametro una estructura informacion.
+- Salida: Entrega un 1 si los buffer estan vacios, en caso contrario un 0.
+- Procedimiento: Verifica cada uno de los buffer, para ver si se encuentran vacios.
+ */
+
 int chequearBuffer(Informacion* informacion)
 {
     int i;
@@ -1488,6 +1573,12 @@ int chequearBuffer(Informacion* informacion)
     }
     return 0;
 }
+
+/*
+- Entrada: Funcion que recibe como parametro una estructura informacion.
+- Salida: -.
+- Procedimiento: Se encarga de hacer e procedimiento pipelene, modelando que las instrucciones pueden llegar a estar en 5 etapas distintas.
+ */
 
 void pipeLine(Informacion *informacion)
 {
@@ -1565,6 +1656,12 @@ void pipeLine(Informacion *informacion)
     }while( chequearBuffer(informacion) != 0 );
 }
 
+/*
+- Entrada: Funcion que recibe como parametro una estructura informacion, una estructura instruccion y un entero que es el PC.
+- Salida: -.
+- Procedimiento: Se encarga de llamar a la funcion, en su respectiva etapa que se encuentra.
+ */
+
 void etapaIF(Informacion *info, Instruccion *instruccion , int PC)
 {   
     if(!strcmp(instruccion->instruccion,"add"))
@@ -1622,6 +1719,12 @@ void etapaIF(Informacion *info, Instruccion *instruccion , int PC)
         vacio(info,instruccion,PC, 1);
     }
 }
+
+/*
+- Entrada: Funcion que recibe como parametro una estructura informacion, una estructura instruccion y un entero que es el PC.
+- Salida: -.
+- Procedimiento: Se encarga de llamar a la funcion, en su respectiva etapa que se encuentra.
+ */
 
 void etapaID(Informacion *info, int PC)
 {   
@@ -1681,6 +1784,12 @@ void etapaID(Informacion *info, int PC)
     }
 }
 
+/*
+- Entrada: Funcion que recibe como parametro una estructura informacion, una estructura instruccion y un entero que es el PC.
+- Salida: -.
+- Procedimiento: Se encarga de llamar a la funcion, en su respectiva etapa que se encuentra.
+ */
+
 void etapaEX(Informacion *info, int PC)
 {
     if(!strcmp(info->buffer[1].instruccion->instruccion,"add"))
@@ -1738,6 +1847,12 @@ void etapaEX(Informacion *info, int PC)
         vacio(info,info->buffer[1].instruccion,PC, 3);
     }
 }
+
+/*
+- Entrada: Funcion que recibe como parametro una estructura informacion, una estructura instruccion y un entero que es el PC.
+- Salida: -.
+- Procedimiento: Se encarga de llamar a la funcion, en su respectiva etapa que se encuentra.
+ */
 
 void etapaMEM(Informacion *info, int PC)
 {
@@ -1797,6 +1912,12 @@ void etapaMEM(Informacion *info, int PC)
     }
 }
 
+/*
+- Entrada: Funcion que recibe como parametro una estructura informacion, una estructura instruccion y un entero que es el PC.
+- Salida: -.
+- Procedimiento: Se encarga de llamar a la funcion, en su respectiva etapa que se encuentra.
+ */
+
 void etapaWB(Informacion *info, int PC)
 {
     if(!strcmp(info->buffer[3].instruccion->instruccion,"add"))
@@ -1855,6 +1976,12 @@ void etapaWB(Informacion *info, int PC)
     }
 }
 
+/*
+- Entrada: Funcion que recibe como parametro una estructura informacion y un entero que representa los ciclos.
+- Salida: -.
+- Procedimiento: Se encarga de crear el archivo que muestra los hazar de datos y control que fueron encontrados.
+ */
+
 void escribirArchivoHazar(Informacion* informacion, int ciclo)
 {
     FILE* archivo = fopen("salida2.csv" , "a");
@@ -1874,6 +2001,12 @@ void escribirArchivoHazar(Informacion* informacion, int ciclo)
 
     fclose(archivo);
 }
+
+/*
+- Entrada: Funcion que recibe como parametro una estructura informacion, una estructura instruccion y un entero que es el PC.
+- Salida: -.
+- Procedimiento: Se encarga de ir escribiendo la traza del programa en una arhivo, representando lo que sucede en cada ciclo.
+ */
 
 void escribirArchivoTraza(Informacion* informacion, int ciclo) 
 { 

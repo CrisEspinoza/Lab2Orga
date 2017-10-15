@@ -40,12 +40,19 @@ int main()
                     bandera++;
                     break;
 
-            case 2: system("cls");
-                    printf("Ingrese nombre del archivo de registros\n");
-                    scanf("%s",archivoRegistro); 
-                    info = leerRegistros(info,archivoRegistro);
-                    bandera++;
-                    break;
+            case 2: if (bandera == 1)
+                    {
+                        system("cls");
+                        printf("Ingrese nombre del archivo de registros\n");
+                        scanf("%s",archivoRegistro); 
+                        info = leerRegistros(info,archivoRegistro);
+                        bandera++;
+                        break;
+                    }
+                    else
+                    {
+                        printf("Primero tiene que realizar la primera opcion del menu.\n");
+                    }
 
             case 3: system("cls");
                     if (bandera >= 2)
@@ -54,7 +61,7 @@ int main()
                     }
                     else
                     {
-                        printf("Primero tiene que cargar la opcion numero 1 y 2, para poder realizar esta opcion\n");
+                        printf("Primero tiene que cargar la opcion numero 1 y 2, para poder realizar esta opcion.\n");
                     }
                     break;
 

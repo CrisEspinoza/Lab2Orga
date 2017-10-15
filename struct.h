@@ -46,6 +46,10 @@ typedef struct Instruccion
 
 }Instruccion;
 
+/*
+Esta estrucutra se encarga de ir guardando la informacion de cada una de las intrucciones a medida que van pasadndo
+por distintos buffer
+ */
 
 typedef struct Buffer
 {
@@ -129,11 +133,11 @@ void addi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa);
 void mul(Informacion *informacion, Instruccion *instruccion, int PC,int etapa);
 void division(Informacion *informacion, Instruccion *instruccion, int PC,int etapa);
 LineaDeControl* asignarLineasDeControl (char* instruccion);
-int jump(Informacion *informacion, Instruccion *instruccion, int PC, int etapa);
+void jump(Informacion *informacion, Instruccion *instruccion, int PC, int etapa);
 int buscarPosicionEtiqueta(char* etiqueta, Informacion *info);
 void sw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa);
 void lw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa);
-int beq(Informacion *informacion, Instruccion *instruccion, int PC, int etapa);
+void beq(Informacion *informacion, Instruccion *instruccion, int PC, int etapa);
 void mostrarLineasDeControl(Lista* lista);
 void mostrar(Instruccion* lista, int largo);
 void realizarSalida(Lista* lista,LineaDeControl* lineasControlDadas);
