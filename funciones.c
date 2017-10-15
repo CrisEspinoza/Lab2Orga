@@ -1101,6 +1101,12 @@ void beq(Informacion *informacion, Instruccion *instruccion, int PC, int etapa)
                 informacion->instrucciones[informacion->buffer[1].addPc].HC = 1;            
                 informacion->instrucciones[informacion->buffer[2].addPc].HC = 1;
                 INTRUCCIONESEJECUTADAS = posrd;
+                informacion->buffer[1].rs = "" ;
+                informacion->buffer[1].rt = "" ;
+                informacion->buffer[1].rd = "" ;
+                informacion->buffer[2].rs = "" ;
+                informacion->buffer[2].rt = "" ;
+                informacion->buffer[2].rd = "" ;
                 informacion->hazarControl = "H.C";
                 BANDERA1 = 4;
                 BANDERA = 1;
