@@ -9,8 +9,9 @@ el PC de la instrucción en la cual se va.
 */
 
 int INTRUCCIONESEJECUTADAS = 0;
-int BANDERA = 0;
-int BANDERA1 = 0;
+int BANDERA = 0 ;
+int BANDERA1 = 0 ;
+int BANDERA2 = 0 ;
 
 // Funciones que leen los archivos
 
@@ -316,7 +317,8 @@ void iniciarBuffer(Buffer* buffer)
     buffer->aluResult = 0;
     buffer->addPc = 0;
     buffer->estado = 0; 
-    buffer->estado1 = 0;    
+    buffer->estado1 = 0; 
+    buffer->estado2 = 0;    
 }
 
 /*
@@ -458,6 +460,7 @@ void add(Informacion *informacion, Instruccion *instruccion, int PC,int etapa) /
         informacion->buffer[0].estado = 1;
         informacion->buffer[0].instruccion = instruccion;
         informacion->buffer[0].addPc = PC;
+        informacion->buffer[0].estado2 = 0;
     }
 
     else if(etapa == 2) //ETAPA ID buffers[1] = ID/EX
@@ -488,7 +491,7 @@ void add(Informacion *informacion, Instruccion *instruccion, int PC,int etapa) /
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
         //Etapa nueva   
-        if (BANDERA1 == 0)
+        if (BANDERA1 == 0 && informacion->buffer[3].estado2 == 0)
         {      
             informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
         }
@@ -503,7 +506,7 @@ void add(Informacion *informacion, Instruccion *instruccion, int PC,int etapa) /
         informacion->buffer[4] = informacion->buffer[3];
         informacion->buffer[3].estado = 0;
         // Etapa nueva
-        if (BANDERA1 == 0)
+        if (BANDERA1 == 0 && informacion->buffer[4].estado2 == 0)
         {
             informacion->registros[posrd] = informacion->buffer[3].writeDataWb;
         }
@@ -538,6 +541,7 @@ void sub(Informacion *informacion, Instruccion *instruccion, int PC,int etapa) /
         informacion->buffer[0].estado = 1;
         informacion->buffer[0].instruccion = instruccion;
         informacion->buffer[0].addPc = PC;
+        informacion->buffer[0].estado2 = 0;
     }
 
     else if(etapa == 2) //ETAPA ID buffers[1] = ID/EX
@@ -568,7 +572,7 @@ void sub(Informacion *informacion, Instruccion *instruccion, int PC,int etapa) /
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
         //Etapa nueva    
-        if (BANDERA1 == 0)
+        if (BANDERA1 == 0 && informacion->buffer[3].estado2 == 0)
         {     
             informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
         }
@@ -583,7 +587,7 @@ void sub(Informacion *informacion, Instruccion *instruccion, int PC,int etapa) /
         informacion->buffer[4] = informacion->buffer[3];
         informacion->buffer[3].estado = 0;
         // Etapa nueva
-        if (BANDERA1 == 0)
+        if (BANDERA1 == 0 && informacion->buffer[4].estado2 == 0)
         {
             informacion->registros[posrd] = informacion->buffer[3].writeDataWb;
         }
@@ -618,6 +622,7 @@ void mul(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[0].instruccion = instruccion;
         informacion->buffer[0].addPc = PC;
         informacion->buffer[0].estado = 1;
+        informacion->buffer[0].estado2 = 0;
     }
 
     else if(etapa == 2) //ETAPA ID buffers[1] = ID/EX
@@ -649,7 +654,7 @@ void mul(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
         //Etapa nueva    
-        if (BANDERA1 == 0)
+        if (BANDERA1 == 0 && informacion->buffer[3].estado2 == 0)
         {     
             informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
         }
@@ -664,7 +669,7 @@ void mul(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[4] = informacion->buffer[3];
         informacion->buffer[3].estado = 0;
         // Etapa nueva
-        if (BANDERA1 == 0)
+        if (BANDERA1 == 0 && informacion->buffer[4].estado2 == 0)
         {
             informacion->registros[posrd] = informacion->buffer[3].writeDataWb;
         }
@@ -690,6 +695,7 @@ void vacio(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[0].instruccion = instruccion;
         informacion->buffer[0].addPc = PC;
         informacion->buffer[0].estado = 1;
+        informacion->buffer[0].estado2 = 0;
     }
 
     else if(etapa == 2) //ETAPA ID buffers[1] = ID/EX
@@ -721,7 +727,7 @@ void vacio(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
         //Etapa nueva         
-        if (BANDERA1 == 0)
+        if (BANDERA1 == 0 && informacion->buffer[3].estado2 == 0)
         {
             informacion->buffer[3].writeDataWb = 0;
         }
@@ -766,6 +772,7 @@ void division(Informacion *informacion, Instruccion *instruccion, int PC,int eta
         informacion->buffer[0].instruccion = instruccion;
         informacion->buffer[0].addPc = PC;
         informacion->buffer[0].estado = 1;
+        informacion->buffer[0].estado2 = 0;
     }
 
     else if(etapa == 2) //ETAPA ID buffers[1] = ID/EX
@@ -796,7 +803,7 @@ void division(Informacion *informacion, Instruccion *instruccion, int PC,int eta
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
         //Etapa nueva       
-        if (BANDERA1 == 0)
+        if (BANDERA1 == 0 && informacion->buffer[3].estado2 == 0)
         {  
             informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
         }
@@ -811,7 +818,7 @@ void division(Informacion *informacion, Instruccion *instruccion, int PC,int eta
         informacion->buffer[4] = informacion->buffer[3];
         informacion->buffer[3].estado = 0;
         // Etapa nueva
-        if (BANDERA1 == 0)
+        if (BANDERA1 == 0 && informacion->buffer[4].estado2 == 0)
         {
             informacion->registros[posrd] = informacion->buffer[3].writeDataWb;
         }
@@ -845,6 +852,7 @@ void subi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[0].instruccion = instruccion;
         informacion->buffer[0].addPc = PC;
         informacion->buffer[0].estado = 1;
+        informacion->buffer[0].estado2 = 0;
     }
 
     else if(etapa == 2) //ETAPA ID buffers[1] = ID/EX
@@ -875,7 +883,7 @@ void subi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
         //Etapa nueva 
-        if (BANDERA1 == 0)
+        if (BANDERA1 == 0 && informacion->buffer[3].estado2 == 0)
         {        
             informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
         }
@@ -890,7 +898,7 @@ void subi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[4] = informacion->buffer[3];
         informacion->buffer[3].estado = 0;       
          // Etapa nueva
-        if (BANDERA1 == 0)
+        if (BANDERA1 == 0 && informacion->buffer[4].estado2 == 0)
         {
             informacion->registros[posrt] = informacion->buffer[3].writeDataWb;
         }
@@ -923,6 +931,7 @@ void addi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[0].instruccion = instruccion;
         informacion->buffer[0].addPc = PC;
         informacion->buffer[0].estado = 1;
+        informacion->buffer[0].estado2 = 0;
     }
 
     else if(etapa == 2) //ETAPA ID buffers[1] = ID/EX
@@ -953,7 +962,7 @@ void addi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
         //Etapa nueva   
-        if (BANDERA1 == 0)
+        if (BANDERA1 == 0 && informacion->buffer[3].estado2 == 0)
         {      
             informacion->buffer[3].writeDataWb = informacion->buffer[3].aluResult;
         }
@@ -968,7 +977,7 @@ void addi(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[4] = informacion->buffer[3];
         informacion->buffer[3].estado = 0;
         // Etapa nueva
-        if (BANDERA1 == 0)
+        if (BANDERA1 == 0 && informacion->buffer[4].estado2 == 0)
         {
             informacion->registros[posrt] = informacion->buffer[3].writeDataWb;
         }
@@ -995,6 +1004,7 @@ void jump(Informacion *informacion, Instruccion *instruccion, int PC, int etapa)
         informacion->buffer[0].instruccion = instruccion;
         informacion->buffer[0].addPc = PC;
         informacion->buffer[0].estado = 1;
+        informacion->buffer[0].estado2 = 0;
     }
 
     else if(etapa == 2) //ETAPA ID buffers[1] = ID/EX
@@ -1005,17 +1015,14 @@ void jump(Informacion *informacion, Instruccion *instruccion, int PC, int etapa)
         informacion->buffer[1].rs = informacion->buffer[1].instruccion->rs;
         informacion->buffer[1].rt = informacion->buffer[1].instruccion->rt;        
         informacion->buffer[1].rd = informacion->buffer[1].instruccion->rt;
-        char *etiqueta = (char*)malloc(sizeof(char)*100);
-        strcpy(etiqueta,informacion->buffer[1].instruccion->rd);
-        strcat(etiqueta,":");
-        INTRUCCIONESEJECUTADAS = buscarPosicionEtiqueta(etiqueta, informacion);
-
+        informacion->hazarControl = "H.C" ;
     }
  
     else if(etapa == 3) //ETAPA EX buffers[2] = EX/MEM
     {   
         informacion->buffer[2] = informacion->buffer[1];
         informacion->buffer[1].estado = 0;
+        BANDERA2 = 1;
     }
 
     else if(etapa == 4) //ETAPA MEM buffers[3] = MEM/WB
@@ -1059,6 +1066,7 @@ void beq(Informacion *informacion, Instruccion *instruccion, int PC, int etapa)
         informacion->buffer[0].instruccion = instruccion;
         informacion->buffer[0].addPc = PC;
         informacion->buffer[0].estado = 1;
+        informacion->buffer[0].estado2 = 0;
     }
 
     else if(etapa == 2) //ETAPA ID buffers[1] = ID/EX
@@ -1090,7 +1098,7 @@ void beq(Informacion *informacion, Instruccion *instruccion, int PC, int etapa)
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
         //Etapa nueva   
-        if (BANDERA1 == 0)
+        if (BANDERA1 == 0 && informacion->buffer[3].estado2 == 0) 
         {      
             if (informacion->buffer[3].zero == 0 )
             {
@@ -1151,6 +1159,7 @@ void lw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[0].instruccion = instruccion;
         informacion->buffer[0].addPc = PC;
         informacion->buffer[0].estado = 1;
+        informacion->buffer[0].estado2 = 0;
     }
 
     else if(etapa == 2) //ETAPA ID buffers[1] = ID/EX
@@ -1181,7 +1190,7 @@ void lw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
         //Etapa nueva      
-        if (BANDERA1 == 0)
+        if (BANDERA1 == 0 && informacion->buffer[3].estado2 == 0)
         {   
             informacion->buffer[3].writeDataWb = informacion->memoria[informacion->buffer[3].aluResult];
         }
@@ -1196,7 +1205,7 @@ void lw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[4] = informacion->buffer[3];
         informacion->buffer[3].estado = 0;
         // Etapa nueva
-        if (BANDERA1 == 0)
+        if (BANDERA1 == 0 && informacion->buffer[4].estado2 == 0)
         {
             informacion->registros[posrt] = informacion->buffer[3].writeDataWb;
         }
@@ -1227,6 +1236,7 @@ void sw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[0].instruccion = instruccion;
         informacion->buffer[0].addPc = PC;
         informacion->buffer[0].estado = 1;
+        informacion->buffer[0].estado2 = 0;
     }
 
     else if(etapa == 2) //ETAPA ID buffers[1] = ID/EX
@@ -1258,7 +1268,7 @@ void sw(Informacion *informacion, Instruccion *instruccion, int PC,int etapa)
         informacion->buffer[3] = informacion->buffer[2];
         informacion->buffer[2].estado = 0;
         //Etapa nueva   
-        if (BANDERA1 == 0)
+        if (BANDERA1 == 0 && informacion->buffer[3].estado2 == 0)
         {      
             informacion->memoria[informacion->buffer[3].aluResult] = informacion->registros[informacion->buffer[3].posRegistro];
         }
@@ -1439,9 +1449,10 @@ LineaDeControl* asignarLineasDeControl (char* instruccion)
 
 int is_nop(Informacion* informacion)
 {
-    if( (informacion->buffer[1].lineaDeControl->MemRead == '1' )  &&
-        ( strcmp(informacion->buffer[1].rd , informacion->instrucciones[INTRUCCIONESEJECUTADAS].rs ) == 0 || 
-        strcmp( informacion->buffer[1].rd , informacion->instrucciones[INTRUCCIONESEJECUTADAS].rt ) == 0 ) )  
+    if( (informacion->buffer[1].lineaDeControl->MemRead == '1' ) && (strcmp(informacion->buffer[1].instruccion->instruccion , informacion->instrucciones[INTRUCCIONESEJECUTADAS].instruccion) != 0) &&
+        ( strcmp(informacion->buffer[1].rt , informacion->instrucciones[INTRUCCIONESEJECUTADAS].rs ) == 0 || 
+        strcmp( informacion->buffer[1].rt  , informacion->instrucciones[INTRUCCIONESEJECUTADAS].rt ) == 0 ) && 
+        strcmp(informacion->buffer[1].instruccion->instruccion , "lw") == 0 )  
     {
         return 1;
     }
@@ -1586,7 +1597,7 @@ int chequearBuffer(Informacion* informacion)
 - Procedimiento: Se encarga de hacer e procedimiento pipelene, modelando que las instrucciones pueden llegar a estar en 5 etapas distintas.
  */
 
-void pipeLine(Informacion *informacion)
+void pipeLine(Informacion *informacion, char nombreSalida1[], char nombreSalida2[])
 {
     int i = 0;
     int ciclo = 1;
@@ -1630,12 +1641,6 @@ void pipeLine(Informacion *informacion)
                 etapaIF(informacion,nob,INTRUCCIONESEJECUTADAS);
             }
 
-            else if ( strcmp(informacion->buffer[1].instruccion->instruccion , "j" ) == 0 )
-            {
-                etapaIF(informacion,nob,INTRUCCIONESEJECUTADAS);
-                informacion->hazarControl = "H.C" ;
-            }
-
             else
             {
                 etapaIF(informacion,&informacion->instrucciones[INTRUCCIONESEJECUTADAS],INTRUCCIONESEJECUTADAS);
@@ -1655,9 +1660,25 @@ void pipeLine(Informacion *informacion)
             informacion->buffer[2].estado1 = 1;
             BANDERA = 0;
         }
+
+        if (BANDERA2 == 1)
+        {
+            char *etiqueta = (char*)malloc(sizeof(char)*100);
+            strcpy(etiqueta,informacion->buffer[2].instruccion->rd);
+            strcat(etiqueta,":");
+            INTRUCCIONESEJECUTADAS = buscarPosicionEtiqueta(etiqueta, informacion);
+            informacion->buffer[1].rs = "" ;
+            informacion->buffer[1].rt = "" ;
+            informacion->buffer[1].rd = "" ;
+            informacion->buffer[1].readData1Id = 0;
+            informacion->buffer[1].readData2Id = 0;
+            informacion->buffer[1].writeDataWb = 0;
+            informacion->buffer[1].estado2 = 1;
+            BANDERA2--;
+        }
         
-        escribirArchivoTraza(informacion ,ciclo);
-        escribirArchivoHazar(informacion,ciclo);
+        escribirArchivoTraza(informacion ,ciclo,nombreSalida1);
+        escribirArchivoHazar(informacion,ciclo,nombreSalida2);
         ciclo++;
     }while( chequearBuffer(informacion) != 0 );
 }
@@ -1988,9 +2009,9 @@ void etapaWB(Informacion *info, int PC)
 - Procedimiento: Se encarga de crear el archivo que muestra los hazar de datos y control que fueron encontrados.
  */
 
-void escribirArchivoHazar(Informacion* informacion, int ciclo)
+void escribirArchivoHazar(Informacion* informacion, int ciclo, char nombreArchivo[])
 {
-    FILE* archivo = fopen("salida2.csv" , "a");
+    FILE* archivo = fopen(nombreArchivo , "a");
     int i;
 
     if (ciclo == 1)
@@ -2014,9 +2035,9 @@ void escribirArchivoHazar(Informacion* informacion, int ciclo)
 - Procedimiento: Se encarga de ir escribiendo la traza del programa en una arhivo, representando lo que sucede en cada ciclo.
  */
 
-void escribirArchivoTraza(Informacion* informacion, int ciclo) 
+void escribirArchivoTraza(Informacion* informacion, int ciclo,char nombreArchivo[]) 
 { 
-    FILE *archivo = fopen("salida1.csv", "a"); 
+    FILE *archivo = fopen(nombreArchivo, "a"); 
 
     int i ;
     if (ciclo == 1)
@@ -2028,7 +2049,7 @@ void escribirArchivoTraza(Informacion* informacion, int ciclo)
 
     for (i = 0; i < 5; i++)
     {
-        if (informacion->buffer[i].estado1 == 0)
+        if (informacion->buffer[i].estado1 == 0 && informacion->buffer[i].estado2 == 0)
         {
             if  (
             !strcmp(informacion->buffer[i].instruccion->instruccion,"add") ||

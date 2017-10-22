@@ -13,7 +13,8 @@ int main()
     int opcion,contador,instrucciones;
     int bandera = 0;
     char archivoEntrada[50];
-    char archivoSalida[50];
+    char archivoSalida1[50];
+    char archivoSalida2[50];
     char archivoRegistro[50];
     Informacion* info = (Informacion*)malloc(sizeof(Informacion));
 
@@ -56,8 +57,14 @@ int main()
 
             case 3: system("cls");
                     if (bandera >= 2)
-                    { 
-                        pipeLine(info);
+                    {
+                        printf("Ingrese el nombre de archivo de salida del primer archivo (Sin extension):\n");
+                        scanf("%s",archivoSalida1); 
+                        printf("Ingrese el nombre de archivo de salida del primer archivo (Sin extension):\n");
+                        scanf("%s",archivoSalida2); 
+                        strcat(archivoSalida1,".csv");
+                        strcat(archivoSalida2,".csv");
+                        pipeLine(info,archivoSalida1,archivoSalida2);
                     }
                     else
                     {

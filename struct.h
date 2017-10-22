@@ -55,6 +55,7 @@ typedef struct Buffer
 {
 	int estado;
 	int estado1;
+	int estado2;
 	Instruccion* instruccion;
 	LineaDeControl* lineaDeControl;
 	char* muxRegDs;
@@ -143,7 +144,7 @@ void mostrar(Instruccion* lista, int largo);
 void realizarSalida(Lista* lista,LineaDeControl* lineasControlDadas);
 LineaDeControl* resetearLineasControl(LineaDeControl* lineaDeContol);
 void iniciarBuffer(Buffer* buffer);
-void pipeLine(Informacion *informacion);
+void pipeLine(Informacion *informacion, char nombreSalida1[], char nombreSalida2[]);
 void etapaIF(Informacion *info, Instruccion *instruccion, int PC);
 Instruccion* inicializarIntrucciones(Instruccion* instruccion);
 void mostrarLineasControl(LineaDeControl* aux);
@@ -156,7 +157,7 @@ void etapaWB(Informacion *info, int PC);
 int chequearBuffer(Informacion* informacion);
 void vacio(Informacion *informacion, Instruccion *instruccion, int PC,int etapa);
 void fordwarding(Informacion *informacion);
-void escribirArchivoTraza(Informacion* informacion, int ciclo);
-void escribirArchivoHazar(Informacion* informacion, int ciclo);
+void escribirArchivoTraza(Informacion* informacion, int ciclo,char archivo[]);
+void escribirArchivoHazar(Informacion* informacion, int ciclo, char archivo[]);
 void hazarDatoMEM( Informacion* informacion );
 void hazarDatoEx( Informacion* informacion );
