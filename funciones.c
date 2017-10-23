@@ -209,9 +209,11 @@ void inicializarMemoriaParaInstrucciones(Informacion *informacion, int cantidadL
 
     informacion->instrucciones = (Instruccion*)malloc(sizeof(Instruccion)*cantidadLineas);
     informacion->buffer = (Buffer*)malloc(sizeof(Buffer)*5);
-    informacion->hazarDato = (char*)malloc(sizeof(char)*100);
+    informacion->hazarDatoEx = (char*)malloc(sizeof(char)*100);
+    informacion->hazarDatoMem = (char*)malloc(sizeof(char)*100);
     informacion->hazarControl = (char*)malloc(sizeof(char)*100);
-    informacion->hazarDato = "" ;
+    informacion->hazarDatoEx = "" ;
+    informacion->hazarDatoMem = "" ;
     informacion->hazarControl = "" ; 
 
     for (i = 0; i < cantidadLineas; i++)
@@ -1472,15 +1474,17 @@ int is_nop(Informacion* informacion)
 void hazarDatoEx( Informacion* informacion ) 
 {
 
-    if ( informacion->buffer[2].lineaDeControl->RegWrite == '1' && strcmp(informacion->buffer[2].rd , informacion->buffer[1].rs) == 0  )
+    if ( informacion->buffer[2].lineaDeControl->RegWrite == '1' && strcmp(informacion->buffer[2].rd , informacion->buffer[1].rs) == 0  &&
+        strcmp(informacion->buffer[2].instruccion->instruccion, "beq") != 0 )
     {
-        informacion->hazarDato = informacion->buffer[2].rd; 
+        informacion->hazarDatoEx = informacion->buffer[2].rd; 
         informacion->buffer[1].readData1Id = informacion->buffer[2].aluResult;
     }
 
-    if ( informacion->buffer[2].lineaDeControl->RegWrite == '1' && strcmp(informacion->buffer[2].rd , informacion->buffer[1].rt) == 0 )
+    if ( informacion->buffer[2].lineaDeControl->RegWrite == '1' && strcmp(informacion->buffer[2].rd , informacion->buffer[1].rt) == 0 &&
+        strcmp(informacion->buffer[2].instruccion->instruccion, "beq") != 0 )
     {
-        informacion->hazarDato = informacion->buffer[2].rd; 
+        informacion->hazarDatoEx = informacion->buffer[2].rd; 
         informacion->buffer[1].readData2Id = informacion->buffer[2].aluResult;
     }
 }
@@ -1493,9 +1497,10 @@ void hazarDatoEx( Informacion* informacion )
 
 void hazarDatoMEM( Informacion* informacion ) 
 {
-    if (informacion->buffer[3].lineaDeControl->RegWrite == '1' && strcmp(informacion->buffer[3].rd , informacion->buffer[1].rs ) == 0 )
+    if (informacion->buffer[3].lineaDeControl->RegWrite == '1' && strcmp(informacion->buffer[3].rd , informacion->buffer[1].rs ) == 0 &&
+        strcmp(informacion->buffer[2].instruccion->instruccion, "beq") != 0 )
     {
-        informacion->hazarDato = informacion->buffer[3].rd; 
+        informacion->hazarDatoMem = informacion->buffer[3].rd; 
 
         if(informacion->buffer[3].lineaDeControl->MemRead == '1')
         {
@@ -1509,9 +1514,10 @@ void hazarDatoMEM( Informacion* informacion )
 
     }
 
-    if (informacion->buffer[3].lineaDeControl->RegWrite == '1' && strcmp(informacion->buffer[3].rd , informacion->buffer[1].rt ) == 0 )
+    if (informacion->buffer[3].lineaDeControl->RegWrite == '1' && strcmp(informacion->buffer[3].rd , informacion->buffer[1].rt ) == 0 &&
+    strcmp(informacion->buffer[2].instruccion->instruccion, "beq") != 0  )
     {
-        informacion->hazarDato = informacion->buffer[3].rd; 
+        informacion->hazarDatoMem = informacion->buffer[3].rd; 
 
         if(informacion->buffer[3].lineaDeControl->MemRead == '1' )
         {
@@ -1636,7 +1642,7 @@ void pipeLine(Informacion *informacion, char nombreSalida1[], char nombreSalida2
 
         if (informacion->cantidadDeInstrucciones > INTRUCCIONESEJECUTADAS)
         {
-            if (is_nop(informacion) == 1 )
+            if (is_nop(informacion) == 1 || BANDERA == 1 )
             {
                 etapaIF(informacion,nob,INTRUCCIONESEJECUTADAS);
             }
@@ -1658,6 +1664,12 @@ void pipeLine(Informacion *informacion, char nombreSalida1[], char nombreSalida2
         {
             informacion->buffer[1].estado1 = 1;
             informacion->buffer[2].estado1 = 1;
+            informacion->buffer[1].rs = "" ;
+            informacion->buffer[1].rt = "" ;
+            informacion->buffer[1].rd = "" ;
+            informacion->buffer[2].rs = "" ;
+            informacion->buffer[2].rt = "" ;
+            informacion->buffer[2].rd = "" ;
             BANDERA = 0;
         }
 
@@ -2016,14 +2028,15 @@ void escribirArchivoHazar(Informacion* informacion, int ciclo, char nombreArchiv
 
     if (ciclo == 1)
     {
-        fprintf (archivo, "%s ; %s ; %s \n", "Etapas","Hazar de datos","Hazar de control");
+        fprintf (archivo, "%s ; %s ; %s \n", "Ciclo","Hazar de datos (Ex - Mem)","Hazar de control");
     }
 
-    fprintf(archivo, " %d ; %s ; %s ", ciclo, informacion->hazarDato, informacion->hazarControl );
+    fprintf(archivo, " %d ; %s - %s ; %s ", ciclo, informacion->hazarDatoEx,informacion->hazarDatoMem, informacion->hazarControl );
 
     fprintf(archivo, "\n");
 
-    informacion->hazarDato = "";
+    informacion->hazarDatoEx = "";
+    informacion->hazarDatoMem = "";
     informacion->hazarControl = "";
 
     fclose(archivo);
@@ -2042,7 +2055,7 @@ void escribirArchivoTraza(Informacion* informacion, int ciclo,char nombreArchivo
     int i ;
     if (ciclo == 1)
     {
-        fprintf (archivo, "%s ; %s ;%s ;%s ;%s ;%s \n", "Etapas","IF","ID","EX","MEM","WB");
+        fprintf (archivo, "%s ; %s ;%s ;%s ;%s ;%s \n", "Ciclo","IF","ID","EX","MEM","WB");
     }
 
     fprintf(archivo, " %d ;", ciclo );

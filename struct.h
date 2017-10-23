@@ -113,7 +113,8 @@ typedef struct Informacion
 	Label etiqueta[100];
 	int memoria[1000];
 	Buffer* buffer;
-	char* hazarDato;
+	char* hazarDatoEx;
+	char* hazarDatoMem;
 	char* hazarControl;
 
 }Informacion;

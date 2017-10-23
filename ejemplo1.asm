@@ -10,5 +10,3 @@ j FIN
 addi $t2, $zero, 3
 sub $t3, $t2, $t1
 FIN:
-lw $t1, 0($sp)
-add $t0, $t1, $t5
